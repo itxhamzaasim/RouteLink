@@ -71,22 +71,28 @@ export function DashboardHeader() {
             <DropdownMenuSeparator />
             {user?.role === "admin" && (
               <>
-                <DropdownMenuItem render={<Link href="/admin" />} className="font-semibold text-brand-600 focus:text-brand-700">
-                  Admin Portal
+                <DropdownMenuItem className="p-0">
+                  <Link href="/admin" className="flex w-full items-center px-3 py-2 text-sm font-semibold text-brand-600 focus:text-brand-700 select-none">
+                    Admin Portal
+                  </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
               </>
             )}
-            <DropdownMenuItem render={<Link href={ROUTES.dashboardProfile} />}>
-              Profile
+            <DropdownMenuItem className="p-0">
+              <Link href={ROUTES.dashboardProfile} className="flex w-full items-center px-3 py-2 text-sm text-neutral-700 focus:text-neutral-900 select-none">
+                Profile
+              </Link>
             </DropdownMenuItem>
-            <DropdownMenuItem render={<Link href={ROUTES.dashboardSettings} />}>
-              Settings
+            <DropdownMenuItem className="p-0">
+              <Link href={ROUTES.dashboardSettings} className="flex w-full items-center px-3 py-2 text-sm text-neutral-700 focus:text-neutral-900 select-none">
+                Settings
+              </Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem
               onClick={() => logout()}
-              className="text-red-600 focus:text-red-600"
+              className="text-red-650 hover:bg-red-50 focus:bg-red-50 focus:text-red-700 px-3 py-2 cursor-pointer"
             >
               <LogOut className="size-4" />
               Log out

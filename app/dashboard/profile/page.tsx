@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 
 export default function ProfilePage() {
-  const { user } = useAuthContext();
+  const { user, logout } = useAuthContext();
 
   const initials = user
     ? `${user.firstName[0]}${user.lastName[0]}`.toUpperCase()
@@ -64,6 +64,25 @@ export default function ProfilePage() {
           </div>
           <Button className="bg-neutral-900 text-white hover:bg-neutral-800">
             Save changes
+          </Button>
+        </CardContent>
+      </Card>
+
+      {/* Account actions section */}
+      <Card className="border-red-200/60 bg-red-50/10 shadow-xs">
+        <CardHeader>
+          <CardTitle className="text-red-900 text-base font-semibold">Account Session</CardTitle>
+          <p className="text-xs text-neutral-500 mt-1">
+            Sign out of your active session. You will need to enter your password to log back in.
+          </p>
+        </CardHeader>
+        <CardContent>
+          <Button
+            type="button"
+            onClick={() => logout()}
+            className="bg-red-650 hover:bg-red-700 text-white font-medium shadow-sm transition-colors duration-250 cursor-pointer"
+          >
+            Log out
           </Button>
         </CardContent>
       </Card>

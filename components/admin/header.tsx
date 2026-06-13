@@ -130,8 +130,10 @@ export function AdminHeader() {
               </p>
             </DropdownMenuLabel>
             <DropdownMenuSeparator className="bg-neutral-850" />
-            <DropdownMenuItem render={<Link href="/dashboard" />} className="text-neutral-300 focus:bg-neutral-800 focus:text-white">
-              Go to Dashboard
+            <DropdownMenuItem className="p-0">
+              <Link href="/dashboard" className="flex w-full items-center px-3 py-2 text-sm text-neutral-300 focus:text-white select-none">
+                Go to Dashboard
+              </Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator className="bg-neutral-850" />
             <DropdownMenuItem
