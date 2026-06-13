@@ -20,4 +20,6 @@ export type {
   Notification,
 } from "./booking";
 export type { CommunityMessage } from "./community";
+export type { DirectMessage, ChatPartner } from "./message";
+
 

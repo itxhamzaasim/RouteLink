@@ -10,6 +10,7 @@ import {
   User,
   ShieldCheck,
   MessageSquare,
+  MessageSquareMore,
 } from "lucide-react";
 import { Logo } from "@/components/common/logo";
 import { DASHBOARD_NAV } from "@/lib/constants";
@@ -24,7 +25,9 @@ const ICON_MAP = {
   Settings,
   ShieldCheck,
   MessageSquare,
+  MessageSquareMore,
 } as const;
+
 
 export function DashboardSidebar() {
   const pathname = usePathname();
