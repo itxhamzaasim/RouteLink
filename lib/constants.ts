@@ -13,6 +13,7 @@ export const ROUTES = {
   dashboardProfile: "/dashboard/profile",
   dashboardSettings: "/dashboard/settings",
   dashboardSearch: "/dashboard/search",
+  dashboardHistory: "/dashboard/history",
 } as const;
 
 export const AUTH_COOKIE_NAME = "routelink-session";
@@ -29,6 +30,7 @@ export const DASHBOARD_NAV = [
   { label: "Search Rides", href: ROUTES.dashboardSearch, icon: "Search" },
   { label: "My Rides", href: ROUTES.dashboardRides, icon: "Car" },
   { label: "Bookings", href: ROUTES.dashboardBookings, icon: "Ticket" },
+  { label: "History", href: ROUTES.dashboardHistory, icon: "History" },
   { label: "Messages", href: ROUTES.dashboardMessages, icon: "MessageSquareMore" },
   { label: "Community", href: ROUTES.dashboardCommunity, icon: "MessageSquare" },
   { label: "Profile", href: ROUTES.dashboardProfile, icon: "User" },
