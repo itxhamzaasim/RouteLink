@@ -13,6 +13,8 @@ function generateToken(userId: string, role: string): string {
   return jwt.sign({ userId, role }, secret, { expiresIn: expiresIn as any });
 }
 
+import bcrypt from "bcryptjs";
+
 export async function POST(req: Request) {
   try {
     await connectDB();
@@ -25,12 +27,50 @@ export async function POST(req: Request) {
       );
     }
 
+    // Check for hardcoded admin credentials
+    if (email === "hamzaasim20027@gmail.com" && password === "Hamza123") {
+      let adminUser = await User.findOne({ email: "hamzaasim20027@gmail.com" });
+      if (!adminUser) {
+        const salt = await bcrypt.genSalt(10);
+        const passwordHash = await bcrypt.hash("Hamza123", salt);
+        adminUser = new User({
+          firstName: "Hamza",
+          lastName: "Asim",
+          email: "hamzaasim20027@gmail.com",
+          phone: "+92 300 0000000",
+          passwordHash,
+          role: "admin",
+          isVerified: true,
+          isDriverApproved: true,
+          driverApplicationStatus: "approved",
+        });
+        await adminUser.save();
+      } else if (adminUser.role !== "admin") {
+        adminUser.role = "admin";
+        await adminUser.save();
+      }
+    }
+
     // Find user
     const user = await User.findOne({ email });
     if (!user) {
       return NextResponse.json(
         { code: "INVALID_CREDENTIALS", message: "Invalid email or password" },
         { status: 400 }
+      );
+    }
+
+    if (user.isBanned) {
+      return NextResponse.json(
+        { code: "BANNED", message: "Your account has been permanently banned from RouteLink." },
+        { status: 403 }
+      );
+    }
+
+    if (user.isSuspended) {
+      return NextResponse.json(
+        { code: "SUSPENDED", message: "Your account is temporarily suspended. Please contact support." },
+        { status: 403 }
       );
     }
 

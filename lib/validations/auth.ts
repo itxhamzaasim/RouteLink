@@ -56,6 +56,15 @@ export function validateRegister(
     errors.confirmPassword = "Passwords do not match";
   }
 
+  if (credentials.role === "driver") {
+    if (!credentials.vehicleType?.trim()) {
+      errors.vehicleType = "Vehicle type is required for drivers";
+    }
+    if (!credentials.vehicleRegistration?.trim()) {
+      errors.vehicleRegistration = "Vehicle registration number is required";
+    }
+  }
+
   if (!credentials.acceptTerms) {
     errors.acceptTerms = "You must accept the terms and conditions";
   }

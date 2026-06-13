@@ -19,7 +19,7 @@ export type {
   BookingRideDetails,
   Notification,
 } from "./booking";
-export type { CommunityMessage } from "./community";
+export type { CommunityMessage, CommunityPost, CommunityComment } from "./community";
 export type { DirectMessage, ChatPartner } from "./message";
 
 

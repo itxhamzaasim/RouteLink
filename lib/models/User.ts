@@ -10,6 +10,14 @@ export interface IUser extends Document {
   avatarUrl?: string;
   role: "passenger" | "driver" | "admin";
   isVerified: boolean;
+  vehicleType?: string;
+  vehicleRegistration?: string;
+  vehiclePhotos?: string[];
+  drivingLicense?: string;
+  isDriverApproved: boolean;
+  driverApplicationStatus: "none" | "pending" | "approved" | "rejected";
+  isSuspended: boolean;
+  isBanned: boolean;
   createdAt: Date;
   comparePassword: (password: string) => Promise<boolean>;
 }
@@ -52,6 +60,39 @@ const UserSchema = new Schema<IUser>(
       default: "passenger",
     },
     isVerified: {
+      type: Boolean,
+      default: false,
+    },
+    vehicleType: {
+      type: String,
+      default: "",
+    },
+    vehicleRegistration: {
+      type: String,
+      default: "",
+    },
+    vehiclePhotos: {
+      type: [String],
+      default: [],
+    },
+    drivingLicense: {
+      type: String,
+      default: "",
+    },
+    isDriverApproved: {
+      type: Boolean,
+      default: false,
+    },
+    driverApplicationStatus: {
+      type: String,
+      enum: ["none", "pending", "approved", "rejected"],
+      default: "none",
+    },
+    isSuspended: {
+      type: Boolean,
+      default: false,
+    },
+    isBanned: {
       type: Boolean,
       default: false,
     },

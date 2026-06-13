@@ -14,6 +14,11 @@ export interface RegisterCredentials {
   confirmPassword: string;
   role: "passenger" | "driver";
   acceptTerms: boolean;
+  vehicleType?: string;
+  vehicleRegistration?: string;
+  vehiclePhotos?: string[];
+  drivingLicense?: string;
+  avatarUrl?: string;
 }
 
 export interface AuthSession {

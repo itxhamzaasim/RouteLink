@@ -15,6 +15,7 @@ import {
   MessageSquareMore,
   Search,
   History,
+  Star,
 } from "lucide-react";
 import { Logo } from "@/components/common/logo";
 import { useAuthContext } from "@/components/providers/auth-provider";
@@ -122,7 +123,7 @@ export function DashboardMobileNav({ trigger }: DashboardMobileNavProps) {
                   {item.label}
                 </div>
                 {hasDot && (
-                  <span className="size-2 rounded-full bg-emerald-500 animate-pulse mr-1" />
+                  <Star className="size-4 text-emerald-500 fill-emerald-500 animate-pulse mr-1" />
                 )}
               </Link>
             );

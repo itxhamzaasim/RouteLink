@@ -47,6 +47,9 @@ export async function getUserFromRequest(req: Request): Promise<IUser | null> {
 
     const decoded = jwt.verify(token, secret) as DecodedToken;
     const user = await User.findById(decoded.userId);
+    if (user && (user.isSuspended || user.isBanned)) {
+      return null;
+    }
     return user || null;
   } catch (error) {
     console.error("Error in getUserFromRequest:", error);

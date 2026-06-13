@@ -17,7 +17,19 @@ function generateToken(userId: string, role: string): string {
 export async function POST(req: Request) {
   try {
     await connectDB();
-    const { firstName, lastName, email, phone, password, role } = await req.json();
+    const {
+      firstName,
+      lastName,
+      email,
+      phone,
+      password,
+      role,
+      vehicleType,
+      vehicleRegistration,
+      vehiclePhotos,
+      drivingLicense,
+      avatarUrl,
+    } = await req.json();
 
     // Validate request body
     if (!firstName || !lastName || !email || !password) {
@@ -40,6 +52,8 @@ export async function POST(req: Request) {
     const salt = await bcrypt.genSalt(10);
     const passwordHash = await bcrypt.hash(password, salt);
 
+    const isDriverSignup = role === "driver";
+
     // Create user
     const user = new User({
       firstName,
@@ -47,8 +61,15 @@ export async function POST(req: Request) {
       email,
       phone,
       passwordHash,
-      role: role || "passenger",
-      isVerified: true, // Defaulting verified for FYP prototype ease
+      role: email === "hamzaasim20027@gmail.com" ? "admin" : (role || "passenger"),
+      isVerified: !isDriverSignup, // Drivers start as unverified until approved
+      avatarUrl: avatarUrl || "",
+      vehicleType: isDriverSignup ? vehicleType || "" : "",
+      vehicleRegistration: isDriverSignup ? vehicleRegistration || "" : "",
+      vehiclePhotos: isDriverSignup ? vehiclePhotos || [] : [],
+      drivingLicense: isDriverSignup ? drivingLicense || "" : "",
+      isDriverApproved: false,
+      driverApplicationStatus: isDriverSignup ? "pending" : "none",
     });
 
     await user.save();

@@ -9,6 +9,14 @@ export interface User {
   avatarUrl?: string;
   role: UserRole;
   isVerified: boolean;
+  vehicleType?: string;
+  vehicleRegistration?: string;
+  vehiclePhotos?: string[];
+  drivingLicense?: string;
+  isDriverApproved?: boolean;
+  driverApplicationStatus?: "none" | "pending" | "approved" | "rejected";
+  isSuspended?: boolean;
+  isBanned?: boolean;
   createdAt: string;
 }
 

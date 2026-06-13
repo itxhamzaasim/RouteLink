@@ -25,7 +25,12 @@ export function RegisterForm() {
     confirmPassword: "",
     role: "passenger",
     acceptTerms: false,
+    vehicleType: "",
+    vehicleRegistration: "",
+    drivingLicense: "",
+    avatarUrl: "",
   });
+  const [vehiclePhotoUrl, setVehiclePhotoUrl] = useState("");
   const [redirectTo, setRedirectTo] = useState<string | undefined>(undefined);
 
   useEffect(() => {
@@ -62,7 +67,11 @@ export function RegisterForm() {
 
     setIsLoading(true);
     try {
-      await register(credentials, redirectTo);
+      const payload = {
+        ...credentials,
+        vehiclePhotos: vehiclePhotoUrl.trim() ? [vehiclePhotoUrl.trim()] : [],
+      };
+      await register(payload, redirectTo);
     } catch {
       setFormError("Registration failed. Please try again.");
     } finally {
@@ -163,6 +172,76 @@ export function RegisterForm() {
           ))}
         </div>
       </div>
+
+      {credentials.role === "driver" && (
+        <div className="space-y-4 rounded-xl border border-neutral-200 bg-neutral-50/50 p-4">
+          <h3 className="font-semibold text-neutral-800 text-sm">Driver Profile & Vehicle Details</h3>
+          
+          <div className="space-y-2">
+            <Label htmlFor="avatarUrl">Profile Photo URL</Label>
+            <Input
+              id="avatarUrl"
+              placeholder="https://example.com/avatar.jpg"
+              value={credentials.avatarUrl || ""}
+              onChange={(e) => handleChange("avatarUrl", e.target.value)}
+              className="h-11 bg-white"
+            />
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="space-y-2">
+              <Label htmlFor="vehicleType">Vehicle Type</Label>
+              <Input
+                id="vehicleType"
+                placeholder="e.g., Honda Civic, Toyota Corolla"
+                value={credentials.vehicleType || ""}
+                onChange={(e) => handleChange("vehicleType", e.target.value)}
+                aria-invalid={!!errors.vehicleType}
+                className="h-11 bg-white"
+              />
+              {errors.vehicleType && (
+                <p className="text-sm text-red-600">{errors.vehicleType}</p>
+              )}
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="vehicleRegistration">Registration Number</Label>
+              <Input
+                id="vehicleRegistration"
+                placeholder="e.g., LEB-1234"
+                value={credentials.vehicleRegistration || ""}
+                onChange={(e) => handleChange("vehicleRegistration", e.target.value)}
+                aria-invalid={!!errors.vehicleRegistration}
+                className="h-11 bg-white"
+              />
+              {errors.vehicleRegistration && (
+                <p className="text-sm text-red-600">{errors.vehicleRegistration}</p>
+              )}
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="vehiclePhotoUrl">Vehicle Photo URL</Label>
+            <Input
+              id="vehiclePhotoUrl"
+              placeholder="https://example.com/car.jpg"
+              value={vehiclePhotoUrl}
+              onChange={(e) => setVehiclePhotoUrl(e.target.value)}
+              className="h-11 bg-white"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="drivingLicense">Driving License URL (Optional)</Label>
+            <Input
+              id="drivingLicense"
+              placeholder="https://example.com/license.jpg"
+              value={credentials.drivingLicense || ""}
+              onChange={(e) => handleChange("drivingLicense", e.target.value)}
+              className="h-11 bg-white"
+            />
+          </div>
+        </div>
+      )}
 
       <div className="space-y-2">
         <Label htmlFor="password">Password</Label>

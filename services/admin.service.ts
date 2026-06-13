@@ -76,4 +76,28 @@ export const adminService = {
       token,
     });
   },
+
+  async verifyDriver(
+    id: string,
+    action: "approve" | "reject",
+    token: string
+  ): Promise<User> {
+    return apiClient<User>(`/admin/drivers/${id}/verify`, {
+      method: "PATCH",
+      body: { action },
+      token,
+    });
+  },
+
+  async updateUserStatus(
+    id: string,
+    action: "suspend" | "ban" | "restore",
+    token: string
+  ): Promise<User> {
+    return apiClient<User>(`/admin/users/${id}/status`, {
+      method: "PATCH",
+      body: { action },
+      token,
+    });
+  },
 };

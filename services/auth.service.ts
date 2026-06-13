@@ -138,4 +138,43 @@ export const authService = {
       throw error;
     }
   },
+
+  async switchRole(role: "passenger" | "driver", token: string): Promise<User> {
+    const updatedUser = await apiClient<User>("/auth/switch-role", {
+      method: "POST",
+      body: { role },
+      token,
+    });
+    
+    // Update local storage session
+    const session = this.getStoredSession();
+    if (session) {
+      session.user = updatedUser;
+      persistSession(session);
+    }
+    return updatedUser;
+  },
+
+  async applyRider(
+    vehicleData: {
+      vehicleType: string;
+      vehicleRegistration: string;
+      vehiclePhotos?: string[];
+      drivingLicense?: string;
+    },
+    token: string
+  ): Promise<User> {
+    const updatedUser = await apiClient<User>("/auth/apply-rider", {
+      method: "POST",
+      body: vehicleData,
+      token,
+    });
+    
+    const session = this.getStoredSession();
+    if (session) {
+      session.user = updatedUser;
+      persistSession(session);
+    }
+    return updatedUser;
+  },
 };
