@@ -49,7 +49,7 @@ function SearchResultsContent() {
   });
 
   const [isLoading, setIsLoading] = useState(true);
-  const [isAuthenticated, setIsAuthenticated] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const [error, setError] = useState("");
 
   const [sortBy, setSortBy] = useState<"date" | "price">("date");
@@ -70,24 +70,31 @@ function SearchResultsContent() {
     });
   }, [searchParams]);
 
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const rawAuth = localStorage.getItem("routelink-auth");
+      if (!rawAuth) {
+        setIsAuthenticated(false);
+        router.push(`/login?redirect=${encodeURIComponent(window.location.pathname + window.location.search)}`);
+      } else {
+        setIsAuthenticated(true);
+      }
+    }
+  }, [router]);
+
   const loadSearchResults = useCallback(async () => {
+    if (isAuthenticated === null || !isAuthenticated) return;
     setIsLoading(true);
     setError("");
 
     if (typeof window === "undefined") return;
     const rawAuth = localStorage.getItem("routelink-auth");
-    if (!rawAuth) {
-      setIsAuthenticated(false);
-      setIsLoading(false);
-      return;
-    }
+    if (!rawAuth) return;
 
     let token = "";
     try {
       token = JSON.parse(rawAuth).accessToken;
     } catch {
-      setIsAuthenticated(false);
-      setIsLoading(false);
       return;
     }
 
@@ -112,11 +119,13 @@ function SearchResultsContent() {
     } finally {
       setIsLoading(false);
     }
-  }, [searchParams, sortBy, sortOrder, currentPage]);
+  }, [searchParams, sortBy, sortOrder, currentPage, isAuthenticated]);
 
   useEffect(() => {
-    loadSearchResults();
-  }, [loadSearchResults]);
+    if (isAuthenticated) {
+      loadSearchResults();
+    }
+  }, [loadSearchResults, isAuthenticated]);
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -153,23 +162,10 @@ function SearchResultsContent() {
     setBookingOpen(true);
   };
 
-  if (!isAuthenticated) {
+  if (isAuthenticated === null || !isAuthenticated) {
     return (
-      <div className="mx-auto max-w-md px-4 py-20 text-center">
-        <Card className="border-neutral-200 p-8 shadow-lg">
-          <CardContent className="space-y-4">
-            <h2 className="text-xl font-bold text-neutral-900">Sign in to search rides</h2>
-            <p className="text-sm text-neutral-500">
-              To browse rides and book travel coordinates with RouteLink, you must be a registered member.
-            </p>
-            <Button
-              onClick={() => router.push(`/login?redirect=${encodeURIComponent(window.location.pathname + window.location.search)}`)}
-              className="w-full bg-brand-600 hover:bg-brand-700 text-white"
-            >
-              Sign In
-            </Button>
-          </CardContent>
-        </Card>
+      <div className="flex h-96 items-center justify-center">
+        <Loader2 className="size-10 animate-spin text-neutral-400" />
       </div>
     );
   }
@@ -187,7 +183,7 @@ function SearchResultsContent() {
             <MapPin className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-brand-600" />
             <Input
               id="originCity"
-              placeholder="e.g. San Francisco"
+              placeholder="e.g. DHA Lahore or Gulberg"
               value={inputs.originCity}
               onChange={(e) => setInputs((p) => ({ ...p, originCity: e.target.value }))}
               className="h-10 pl-9 border-neutral-200 bg-neutral-50"
@@ -201,13 +197,14 @@ function SearchResultsContent() {
             <MapPin className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-neutral-400" />
             <Input
               id="destinationCity"
-              placeholder="e.g. Berkeley"
+              placeholder="e.g. Johar Town or Model Town"
               value={inputs.destinationCity}
               onChange={(e) => setInputs((p) => ({ ...p, destinationCity: e.target.value }))}
               className="h-10 pl-9 border-neutral-200 bg-neutral-50"
             />
           </div>
         </div>
+
 
         <div className="space-y-1">
           <Label htmlFor="date" className="text-neutral-500">Date</Label>
