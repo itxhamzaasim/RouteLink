@@ -1,7 +1,8 @@
 import type { AuthError } from "@/types";
 
 const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001/api";
+  process.env.NEXT_PUBLIC_API_URL ??
+  (typeof window !== "undefined" ? "/api" : "http://localhost:3000/api");
 
 export class ApiClientError extends Error {
   constructor(
