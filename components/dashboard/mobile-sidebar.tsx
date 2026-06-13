@@ -9,6 +9,7 @@ import {
   Ticket,
   User,
   ShieldCheck,
+  MessageSquare,
 } from "lucide-react";
 import { Logo } from "@/components/common/logo";
 import { useAuthContext } from "@/components/providers/auth-provider";
@@ -30,7 +31,9 @@ const ICON_MAP = {
   User,
   Settings,
   ShieldCheck,
+  MessageSquare,
 } as const;
+
 
 interface DashboardMobileNavProps {
   trigger: ReactElement;

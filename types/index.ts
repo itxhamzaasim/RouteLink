@@ -19,3 +19,5 @@ export type {
   BookingRideDetails,
   Notification,
 } from "./booking";
+export type { CommunityMessage } from "./community";
+

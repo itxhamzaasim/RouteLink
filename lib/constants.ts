@@ -8,6 +8,7 @@ export const ROUTES = {
   dashboard: "/dashboard",
   dashboardRides: "/dashboard/rides",
   dashboardBookings: "/dashboard/bookings",
+  dashboardCommunity: "/dashboard/community",
   dashboardProfile: "/dashboard/profile",
   dashboardSettings: "/dashboard/settings",
 } as const;
@@ -25,6 +26,8 @@ export const DASHBOARD_NAV = [
   { label: "Overview", href: ROUTES.dashboard, icon: "LayoutDashboard" },
   { label: "My Rides", href: ROUTES.dashboardRides, icon: "Car" },
   { label: "Bookings", href: ROUTES.dashboardBookings, icon: "Ticket" },
+  { label: "Community", href: ROUTES.dashboardCommunity, icon: "MessageSquare" },
   { label: "Profile", href: ROUTES.dashboardProfile, icon: "User" },
   { label: "Settings", href: ROUTES.dashboardSettings, icon: "Settings" },
 ] as const;
+

@@ -9,6 +9,7 @@ import {
   Ticket,
   User,
   ShieldCheck,
+  MessageSquare,
 } from "lucide-react";
 import { Logo } from "@/components/common/logo";
 import { DASHBOARD_NAV } from "@/lib/constants";
@@ -22,6 +23,7 @@ const ICON_MAP = {
   User,
   Settings,
   ShieldCheck,
+  MessageSquare,
 } as const;
 
 export function DashboardSidebar() {
@@ -67,21 +69,7 @@ export function DashboardSidebar() {
           );
         })}
       </nav>
-
-      <div className="border-t p-4">
-        <div className="rounded-xl bg-brand-50 p-4">
-          <p className="text-sm font-semibold text-brand-900">Go Pro</p>
-          <p className="mt-1 text-xs text-brand-700">
-            Unlock priority booking and zero service fees.
-          </p>
-          <button
-            type="button"
-            className="mt-3 text-xs font-semibold text-brand-600 hover:text-brand-700"
-          >
-            Learn more &rarr;
-          </button>
-        </div>
-      </div>
     </aside>
   );
 }
+
