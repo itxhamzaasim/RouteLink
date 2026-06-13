@@ -50,60 +50,19 @@ export function DashboardHeader() {
           <span className="absolute top-1.5 right-1.5 size-2 rounded-full bg-brand-600" />
         </Button>
 
-        <DropdownMenu>
-          <DropdownMenuTrigger
-            className="flex items-center gap-2 rounded-full outline-none focus-visible:ring-2 focus-visible:ring-brand-600"
-          >
-            <Avatar className="size-9">
-              <AvatarFallback className="bg-neutral-900 text-sm text-white">
-                {initials}
-              </AvatarFallback>
-            </Avatar>
-            <span className="hidden text-sm font-medium text-neutral-900 sm:block">
-              {user?.firstName} {user?.lastName}
-            </span>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-56">
-            <DropdownMenuLabel>
-              <p className="font-medium">{user?.firstName} {user?.lastName}</p>
-              <p className="text-xs font-normal text-neutral-500">
-                {user?.email}
-              </p>
-            </DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            {user?.role === "admin" && (
-              <>
-                <DropdownMenuItem
-                  onClick={() => router.push("/admin")}
-                  className="font-semibold text-brand-600 focus:text-brand-700 cursor-pointer px-3 py-2 text-sm"
-                >
-                  Admin Portal
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-              </>
-            )}
-            <DropdownMenuItem
-              onClick={() => router.push(ROUTES.dashboardProfile)}
-              className="text-neutral-700 focus:text-neutral-900 cursor-pointer px-3 py-2 text-sm"
-            >
-              Profile
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              onClick={() => router.push(ROUTES.dashboardSettings)}
-              className="text-neutral-700 focus:text-neutral-900 cursor-pointer px-3 py-2 text-sm"
-            >
-              Settings
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem
-              onClick={() => logout()}
-              className="text-red-650 hover:bg-red-50 focus:bg-red-50 focus:text-red-700 px-3 py-2 cursor-pointer flex items-center gap-2"
-            >
-              <LogOut className="size-4" />
-              Log out
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <Link
+          href={ROUTES.dashboardProfile}
+          className="flex items-center gap-2 rounded-full outline-none focus-visible:ring-2 focus-visible:ring-brand-600 hover:opacity-85 transition-opacity"
+        >
+          <Avatar className="size-9">
+            <AvatarFallback className="bg-neutral-900 text-sm text-white">
+              {initials}
+            </AvatarFallback>
+          </Avatar>
+          <span className="hidden text-sm font-medium text-neutral-900 sm:block">
+            {user?.firstName} {user?.lastName}
+          </span>
+        </Link>
       </div>
     </header>
   );

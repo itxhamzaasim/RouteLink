@@ -80,7 +80,7 @@ export default function ProfilePage() {
           <Button
             type="button"
             onClick={() => logout()}
-            className="bg-red-650 hover:bg-red-700 text-white font-medium shadow-sm transition-colors duration-250 cursor-pointer"
+            className="bg-red-600 hover:bg-red-700 text-white font-medium shadow-sm transition-colors duration-250 cursor-pointer"
           >
             Log out
           </Button>

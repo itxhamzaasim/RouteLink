@@ -103,50 +103,19 @@ export function AdminHeader() {
 
       {/* Right Profiles dropdown */}
       <div className="ml-auto flex items-center gap-3">
-        <DropdownMenu>
-          <DropdownMenuTrigger
-            className="flex items-center gap-2 rounded-full outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
-          >
-            <Avatar className="size-9 border border-neutral-800">
-              <AvatarFallback className="bg-brand-600 text-sm font-semibold text-white">
-                {initials}
-              </AvatarFallback>
-            </Avatar>
-            <span className="hidden text-sm font-medium text-neutral-300 sm:block">
-              {user?.firstName} {user?.lastName}
-            </span>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-56 bg-neutral-900 text-neutral-100 border-neutral-800">
-            <DropdownMenuLabel className="text-neutral-400">
-              <p className="font-semibold text-neutral-100">
-                {user?.firstName} {user?.lastName}
-              </p>
-              <p className="text-xs font-normal text-neutral-400 mt-0.5">
-                {user?.email}
-              </p>
-              <p className="mt-1.5">
-                <span className="rounded bg-brand-500/15 px-1.5 py-0.5 text-[9px] font-semibold text-brand-400 uppercase tracking-wider">
-                  {user?.role}
-                </span>
-              </p>
-            </DropdownMenuLabel>
-            <DropdownMenuSeparator className="bg-neutral-850" />
-            <DropdownMenuItem
-              onClick={() => router.push("/dashboard")}
-              className="text-neutral-300 focus:bg-neutral-850 focus:text-white cursor-pointer px-3 py-2 text-sm"
-            >
-              Go to Dashboard
-            </DropdownMenuItem>
-            <DropdownMenuSeparator className="bg-neutral-850" />
-            <DropdownMenuItem
-              onClick={() => logout()}
-              className="text-red-400 focus:bg-red-950/20 focus:text-red-400 cursor-pointer flex items-center gap-2 px-3 py-2 text-sm"
-            >
-              <LogOut className="size-4" />
-              Log out
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <Link
+          href="/dashboard/profile"
+          className="flex items-center gap-2 rounded-full outline-none focus-visible:ring-2 focus-visible:ring-brand-500 hover:opacity-85 transition-opacity"
+        >
+          <Avatar className="size-9 border border-neutral-800">
+            <AvatarFallback className="bg-brand-600 text-sm font-semibold text-white">
+              {initials}
+            </AvatarFallback>
+          </Avatar>
+          <span className="hidden text-sm font-medium text-neutral-300 sm:block">
+            {user?.firstName} {user?.lastName}
+          </span>
+        </Link>
       </div>
     </header>
   );
