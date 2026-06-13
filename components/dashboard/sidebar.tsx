@@ -28,7 +28,7 @@ export function DashboardSidebar() {
   const pathname = usePathname();
   const { user } = useAuthContext();
 
-  const navItems = [...DASHBOARD_NAV];
+  const navItems: { label: string; href: string; icon: string }[] = [...DASHBOARD_NAV];
   if (user?.role === "admin") {
     navItems.push({
       label: "Admin Panel",
