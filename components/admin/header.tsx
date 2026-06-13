@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { LogOut, Menu, User as UserIcon, Car, LayoutDashboard, Users, FileText } from "lucide-react";
 import { useAuthContext } from "@/components/providers/auth-provider";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -34,6 +34,7 @@ const ADMIN_NAV = [
 export function AdminHeader() {
   const { user, logout } = useAuthContext();
   const pathname = usePathname();
+  const router = useRouter();
 
   const initials = user
     ? `${user.firstName[0]}${user.lastName[0]}`.toUpperCase()
@@ -130,17 +131,18 @@ export function AdminHeader() {
               </p>
             </DropdownMenuLabel>
             <DropdownMenuSeparator className="bg-neutral-850" />
-            <DropdownMenuItem className="p-0">
-              <Link href="/dashboard" className="flex w-full items-center px-3 py-2 text-sm text-neutral-300 focus:text-white select-none">
-                Go to Dashboard
-              </Link>
+            <DropdownMenuItem
+              onClick={() => router.push("/dashboard")}
+              className="text-neutral-300 focus:bg-neutral-850 focus:text-white cursor-pointer px-3 py-2 text-sm"
+            >
+              Go to Dashboard
             </DropdownMenuItem>
             <DropdownMenuSeparator className="bg-neutral-850" />
             <DropdownMenuItem
               onClick={() => logout()}
-              className="text-red-400 focus:bg-red-950/20 focus:text-red-400 cursor-pointer"
+              className="text-red-400 focus:bg-red-950/20 focus:text-red-400 cursor-pointer flex items-center gap-2 px-3 py-2 text-sm"
             >
-              <LogOut className="size-4 mr-2" />
+              <LogOut className="size-4" />
               Log out
             </DropdownMenuItem>
           </DropdownMenuContent>

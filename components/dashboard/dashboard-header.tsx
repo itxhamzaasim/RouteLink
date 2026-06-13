@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { Bell, LogOut, Menu, Search } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useAuthContext } from "@/components/providers/auth-provider";
 import { DashboardMobileNav } from "@/components/dashboard/mobile-sidebar";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -19,6 +20,7 @@ import { ROUTES } from "@/lib/constants";
 
 export function DashboardHeader() {
   const { user, logout } = useAuthContext();
+  const router = useRouter();
 
   const initials = user
     ? `${user.firstName[0]}${user.lastName[0]}`.toUpperCase()
@@ -71,28 +73,31 @@ export function DashboardHeader() {
             <DropdownMenuSeparator />
             {user?.role === "admin" && (
               <>
-                <DropdownMenuItem className="p-0">
-                  <Link href="/admin" className="flex w-full items-center px-3 py-2 text-sm font-semibold text-brand-600 focus:text-brand-700 select-none">
-                    Admin Portal
-                  </Link>
+                <DropdownMenuItem
+                  onClick={() => router.push("/admin")}
+                  className="font-semibold text-brand-600 focus:text-brand-700 cursor-pointer px-3 py-2 text-sm"
+                >
+                  Admin Portal
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
               </>
             )}
-            <DropdownMenuItem className="p-0">
-              <Link href={ROUTES.dashboardProfile} className="flex w-full items-center px-3 py-2 text-sm text-neutral-700 focus:text-neutral-900 select-none">
-                Profile
-              </Link>
+            <DropdownMenuItem
+              onClick={() => router.push(ROUTES.dashboardProfile)}
+              className="text-neutral-700 focus:text-neutral-900 cursor-pointer px-3 py-2 text-sm"
+            >
+              Profile
             </DropdownMenuItem>
-            <DropdownMenuItem className="p-0">
-              <Link href={ROUTES.dashboardSettings} className="flex w-full items-center px-3 py-2 text-sm text-neutral-700 focus:text-neutral-900 select-none">
-                Settings
-              </Link>
+            <DropdownMenuItem
+              onClick={() => router.push(ROUTES.dashboardSettings)}
+              className="text-neutral-700 focus:text-neutral-900 cursor-pointer px-3 py-2 text-sm"
+            >
+              Settings
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem
               onClick={() => logout()}
-              className="text-red-650 hover:bg-red-50 focus:bg-red-50 focus:text-red-700 px-3 py-2 cursor-pointer"
+              className="text-red-650 hover:bg-red-50 focus:bg-red-50 focus:text-red-700 px-3 py-2 cursor-pointer flex items-center gap-2"
             >
               <LogOut className="size-4" />
               Log out
