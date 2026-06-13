@@ -59,12 +59,12 @@ export default function AboutPage() {
                   <div className="space-y-2">
                     <h2 className="text-xl font-bold text-neutral-950">Academic Project Ownership</h2>
                     <p className="text-sm text-neutral-600 leading-relaxed">
-                      This platform was researched, designed, and developed as a **Final Year Project (FYP)** submitted to the **Department of Software Engineering**.
+                      This platform was researched, designed, and developed as a **Final Year Project (FYP)** submitted to **ADP CS**.
                     </p>
                     <div className="pt-2 grid gap-3 sm:grid-cols-2 text-xs font-semibold text-neutral-800">
                       <div className="flex items-center gap-2">
                         <User className="size-4 text-brand-600" />
-                        <span>Developer: Muhammad Hamza Asim</span>
+                        <span>Developers: Muhammad Hamza Asim and his Team</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <BookOpen className="size-4 text-brand-600" />

@@ -72,7 +72,7 @@ export function RegisterForm() {
           <Label htmlFor="firstName">First name</Label>
           <Input
             id="firstName"
-            placeholder="Alex"
+            placeholder="Hamza"
             value={credentials.firstName}
             onChange={(e) => handleChange("firstName", e.target.value)}
             aria-invalid={!!errors.firstName}
@@ -86,7 +86,7 @@ export function RegisterForm() {
           <Label htmlFor="lastName">Last name</Label>
           <Input
             id="lastName"
-            placeholder="Rivera"
+            placeholder="Asim"
             value={credentials.lastName}
             onChange={(e) => handleChange("lastName", e.target.value)}
             aria-invalid={!!errors.lastName}
@@ -121,7 +121,7 @@ export function RegisterForm() {
           id="phone"
           type="tel"
           autoComplete="tel"
-          placeholder="+1 (555) 000-0000"
+          placeholder="+92 300 1234567"
           value={credentials.phone}
           onChange={(e) => handleChange("phone", e.target.value)}
           aria-invalid={!!errors.phone}

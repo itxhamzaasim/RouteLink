@@ -38,7 +38,7 @@ export function AuthLayout({
                 A secure campus and corporate ride-sharing platform designed for students and professionals in Lahore. Commute sustainably, share transport expenses, and travel safely.
               </p>
               <p className="text-xs text-neutral-400 font-medium pt-2">
-                Developed by Muhammad Hamza Asim as a Final Year Project for the Department of Software Engineering.
+                Developed by Muhammad Hamza Asim and his Team as a Final Year Project for ADP CS.
               </p>
             </div>
           </div>

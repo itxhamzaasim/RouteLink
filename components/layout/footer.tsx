@@ -65,10 +65,10 @@ export function Footer() {
               &copy; {new Date().getFullYear()} RouteLink. All rights reserved.
             </p>
             <p className="text-xs text-neutral-400 font-medium">
-              Developed by **Muhammad Hamza Asim**
+              Developed by **Muhammad Hamza Asim and his Team**
             </p>
             <p className="text-[10px] text-neutral-500">
-              Final Year Project &middot; Department of Software Engineering
+              Final Year Project &middot; ADP CS
             </p>
           </div>
           <div className="flex gap-6 text-sm">
