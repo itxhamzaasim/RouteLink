@@ -77,28 +77,49 @@ export async function PATCH(
         return NextResponse.json({ message: "Booking is already accepted." }, { status: 400 });
       }
 
-      // Decrement seats atomically to prevent race conditions
-      const updatedRide = await Ride.findOneAndUpdate(
-        { _id: booking.rideId, availableSeats: { $gte: booking.seatsBooked } },
-        { $inc: { availableSeats: -booking.seatsBooked } },
+      // Set available seats to 0 so the ride immediately disappears for others
+      const updatedRide = await Ride.findByIdAndUpdate(
+        booking.rideId,
+        { $set: { availableSeats: 0 } },
         { new: true }
       );
 
       if (!updatedRide) {
         return NextResponse.json(
-          { message: "Insufficient available seats on this ride to accept." },
+          { message: "Associated ride not found." },
           { status: 400 }
         );
       }
 
-      // Notify passenger
+      // Notify accepted passenger
       const notification = new Notification({
         userId: booking.passengerId,
         title: "Ride Request Confirmed",
         message: `Your request for ${booking.seatsBooked} seat(s) on the ride from ${updatedRide.origin.city} to ${updatedRide.destination.city} has been accepted.`,
       });
       await notification.save();
+
+      // Reject all other pending bookings for this same ride
+      const otherPendingBookings = await Booking.find({
+        rideId: booking.rideId,
+        _id: { $ne: booking._id },
+        status: "pending",
+      });
+
+      for (const pendingBk of otherPendingBookings) {
+        pendingBk.status = "rejected";
+        await pendingBk.save();
+
+        // Notify other passenger that they were declined
+        const declineNotif = new Notification({
+          userId: pendingBk.passengerId,
+          title: "Ride Request Declined",
+          message: `Your request for ${pendingBk.seatsBooked} seat(s) on the ride from ${updatedRide.origin.city} to ${updatedRide.destination.city} was declined because another passenger was accepted.`,
+        });
+        await declineNotif.save();
+      }
     } 
+
     
     else if (status === "rejected") {
       if (oldStatus === "accepted") {
