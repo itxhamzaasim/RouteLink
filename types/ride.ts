@@ -38,3 +38,18 @@ export interface Ride {
   status: RideStatus;
   vehicleDetails: VehicleDetails;
 }
+
+export interface RideRequest {
+  id: string;
+  passengerId: string;
+  passengerName: string;
+  passengerRating: number;
+  origin: Location;
+  destination: Location;
+  departureTime: string;
+  seatsNeeded: number;
+  proposedPrice: number;
+  status: "pending" | "accepted" | "cancelled";
+  driverId?: string | null;
+  createdAt?: string;
+}

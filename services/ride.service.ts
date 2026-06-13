@@ -1,5 +1,5 @@
 import { apiClient } from "./api-client";
-import type { Ride } from "@/types";
+import type { Ride, RideRequest } from "@/types";
 
 export const rideService = {
   async getDriverRides(token: string): Promise<Ride[]> {
@@ -87,6 +87,40 @@ export const rideService = {
   async getRideById(id: string, token: string): Promise<Ride> {
     return apiClient<Ride>(`/rides/${id}`, {
       method: "GET",
+      token,
+    });
+  },
+
+  // Ride Request service integrations
+  async getRideRequests(token: string): Promise<RideRequest[]> {
+    return apiClient<RideRequest[]>("/rides/requests", {
+      method: "GET",
+      token,
+    });
+  },
+
+  async createRideRequest(
+    requestData: Omit<RideRequest, "id" | "passengerId" | "passengerName" | "passengerRating" | "status" | "driverId">,
+    token: string
+  ): Promise<RideRequest> {
+    return apiClient<RideRequest>("/rides/requests", {
+      method: "POST",
+      body: requestData,
+      token,
+    });
+  },
+
+  async acceptRideRequest(id: string, token: string): Promise<RideRequest> {
+    return apiClient<RideRequest>(`/rides/requests/${id}`, {
+      method: "PUT",
+      body: { status: "accepted" },
+      token,
+    });
+  },
+
+  async deleteRideRequest(id: string, token: string): Promise<void> {
+    return apiClient<void>(`/rides/requests/${id}`, {
+      method: "DELETE",
       token,
     });
   },

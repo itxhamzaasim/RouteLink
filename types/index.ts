@@ -12,6 +12,7 @@ export type {
   RideStatus,
   Location,
   RideSearchParams,
+  RideRequest,
 } from "./ride";
 export type {
   Booking,
