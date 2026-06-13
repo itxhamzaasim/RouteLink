@@ -14,6 +14,7 @@ export const ROUTES = {
   dashboardSettings: "/dashboard/settings",
   dashboardSearch: "/dashboard/search",
   dashboardHistory: "/dashboard/history",
+  dashboardActivity: "/dashboard/activity",
 } as const;
 
 export const AUTH_COOKIE_NAME = "routelink-session";
@@ -28,6 +29,7 @@ export const NAV_LINKS = [
 export const DASHBOARD_NAV = [
   { label: "Overview", href: ROUTES.dashboard, icon: "LayoutDashboard" },
   { label: "Search Rides", href: ROUTES.dashboardSearch, icon: "Search" },
+  { label: "Activity Feed", href: ROUTES.dashboardActivity, icon: "Bell" },
   { label: "Rides", href: ROUTES.dashboardRides, icon: "Car" },
   { label: "History", href: ROUTES.dashboardHistory, icon: "History" },
   { label: "Messages", href: ROUTES.dashboardMessages, icon: "MessageSquareMore" },

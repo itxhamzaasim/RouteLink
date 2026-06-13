@@ -853,47 +853,6 @@ export default function DashboardPage() {
               </CardContent>
             </Card>
           )}
-
-
-
-          {/* Activity Log / Feed */}
-          <div className="rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm space-y-4">
-            <div className="flex items-center gap-2 text-neutral-900 pb-2 border-b">
-              <Bell className="size-4 text-brand-600" />
-              <h2 className="text-sm font-bold">Activity Feed</h2>
-            </div>
-            {isLoading ? (
-              <div className="flex h-24 items-center justify-center">
-                <Loader2 className="size-4 animate-spin text-neutral-400" />
-              </div>
-            ) : notifications.length === 0 ? (
-              <div className="py-6 text-center text-neutral-400 text-xs">
-                No new updates or alerts.
-              </div>
-            ) : (
-              <div className="space-y-3 max-h-[260px] overflow-y-auto pr-1">
-                {notifications.slice(0, 5).map((notif) => (
-                  <div
-                    key={notif.id}
-                    onClick={() => !notif.isRead && handleMarkRead(notif.id)}
-                    className={`p-3 rounded-xl border text-xs transition-all cursor-pointer relative ${
-                      notif.isRead
-                        ? "bg-neutral-50/50 border-neutral-100 text-neutral-600"
-                        : "bg-brand-50/30 border-brand-100 text-neutral-900 shadow-xs"
-                    }`}
-                  >
-                    <div className="flex items-start justify-between gap-1">
-                      <p className="font-bold text-[11px]">{notif.title}</p>
-                      {!notif.isRead && (
-                        <span className="size-1.5 shrink-0 rounded-full bg-brand-600 mt-1" />
-                      )}
-                    </div>
-                    <p className="text-neutral-500 leading-normal mt-1">{notif.message}</p>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
         </div>
       </div>
     </div>

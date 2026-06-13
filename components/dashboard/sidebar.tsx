@@ -16,6 +16,7 @@ import {
   Search,
   History,
   Star,
+  Bell,
 } from "lucide-react";
 import { Logo } from "@/components/common/logo";
 import { DASHBOARD_NAV } from "@/lib/constants";
@@ -34,6 +35,8 @@ const ICON_MAP = {
   MessageSquareMore,
   Search,
   History,
+  Star,
+  Bell,
 } as const;
 
 

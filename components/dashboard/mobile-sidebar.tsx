@@ -16,6 +16,7 @@ import {
   Search,
   History,
   Star,
+  Bell,
 } from "lucide-react";
 import { Logo } from "@/components/common/logo";
 import { useAuthContext } from "@/components/providers/auth-provider";
@@ -42,6 +43,8 @@ const ICON_MAP = {
   MessageSquareMore,
   Search,
   History,
+  Star,
+  Bell,
 } as const;
 
 
