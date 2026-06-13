@@ -44,7 +44,6 @@ export default function DashboardPage() {
   const [originCity, setOriginCity] = useState("Lahore");
   const [destAddress, setDestAddress] = useState("");
   const [destCity, setDestCity] = useState("Lahore");
-  const [departureTime, setDepartureTime] = useState("");
   const [availableSeats, setAvailableSeats] = useState("4");
   const [pricePerSeat, setPricePerSeat] = useState("500");
   const [vehicleMake, setVehicleMake] = useState("");
@@ -53,6 +52,16 @@ export default function DashboardPage() {
   const [rideSuccess, setRideSuccess] = useState("");
   const [isPosting, setIsPosting] = useState(false);
   const [isSwitching, setIsSwitching] = useState(false);
+
+  // Passenger request routes states
+  const [reqOriginAddress, setReqOriginAddress] = useState("");
+  const [reqOriginCity, setReqOriginCity] = useState("Lahore");
+  const [reqDestAddress, setReqDestAddress] = useState("");
+  const [reqDestCity, setReqDestCity] = useState("Lahore");
+  const [seatsNeeded, setSeatsNeeded] = useState("1");
+  const [proposedPrice, setProposedPrice] = useState("500");
+  const [isRequesting, setIsRequesting] = useState(false);
+  const [requestSuccess, setRequestSuccess] = useState("");
 
   // Populate vehicle details from user profile
   useEffect(() => {
@@ -140,11 +149,6 @@ export default function DashboardPage() {
       return;
     }
 
-    if (!departureTime) {
-      setError("Please pick a departure time.");
-      return;
-    }
-
     if (!vehicleMake || !vehiclePlate) {
       setError("Please provide your vehicle details.");
       return;
@@ -169,7 +173,7 @@ export default function DashboardPage() {
           address: destAddress.trim(),
           city: destCity.trim(),
         },
-        departureTime: departureTime,
+        departureTime: new Date().toISOString(),
         availableSeats: Number(availableSeats),
         pricePerSeat: Number(pricePerSeat),
         vehicleDetails: {
@@ -185,12 +189,59 @@ export default function DashboardPage() {
       setOriginCity("Lahore");
       setDestAddress("");
       setDestCity("Lahore");
-      setDepartureTime("");
       await loadDashboardData();
     } catch (err: any) {
       setError(err.message || "Failed to post ride.");
     } finally {
       setIsPosting(false);
+    }
+  };
+
+  // Handle passenger posting new ride request
+  const handlePostRequest = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!reqOriginAddress.trim() || !reqOriginCity.trim() || !reqDestAddress.trim() || !reqDestCity.trim()) {
+      setError("Please provide both start and destination addresses and cities.");
+      return;
+    }
+
+    if (typeof window === "undefined") return;
+    const rawAuth = localStorage.getItem("routelink-auth");
+    if (!rawAuth) return;
+
+    setIsRequesting(true);
+    setRequestSuccess("");
+    setError("");
+
+    try {
+      const token = JSON.parse(rawAuth).accessToken;
+      const payload = {
+        origin: {
+          address: reqOriginAddress.trim(),
+          city: reqOriginCity.trim(),
+        },
+        destination: {
+          address: reqDestAddress.trim(),
+          city: reqDestCity.trim(),
+        },
+        departureTime: new Date().toISOString(),
+        seatsNeeded: Number(seatsNeeded),
+        proposedPrice: Number(proposedPrice),
+      };
+
+      await rideService.createRideRequest(payload, token);
+      setRequestSuccess("Route request posted successfully!");
+      setReqOriginAddress("");
+      setReqOriginCity("Lahore");
+      setReqDestAddress("");
+      setReqDestCity("Lahore");
+      setSeatsNeeded("1");
+      setProposedPrice("500");
+      await loadDashboardData();
+    } catch (err: any) {
+      setError(err.message || "Failed to post request.");
+    } finally {
+      setIsRequesting(false);
     }
   };
 
@@ -619,16 +670,7 @@ export default function DashboardPage() {
                     </div>
                   </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="departureTime" className="text-xs font-semibold text-neutral-700">Departure Date & Time</Label>
-                    <Input
-                      id="departureTime"
-                      type="datetime-local"
-                      value={departureTime}
-                      onChange={(e) => setDepartureTime(e.target.value)}
-                      className="h-10 bg-white"
-                    />
-                  </div>
+
 
                   <div className="grid grid-cols-2 gap-3">
                     <div className="space-y-2">
@@ -694,6 +736,117 @@ export default function DashboardPage() {
                       </>
                     ) : (
                       "Post Route"
+                    )}
+                  </Button>
+                </form>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* PASSENGER FORM: Request Route Form */}
+          {user?.role === "passenger" && (
+            <Card className="border-neutral-200 shadow-sm">
+              <div className="border-b px-5 py-4 bg-white rounded-t-2xl">
+                <h2 className="text-sm font-bold text-neutral-900 flex items-center gap-2">
+                  <Plus className="size-4 text-brand-600" />
+                  Request a Route
+                </h2>
+              </div>
+              <CardContent className="p-5">
+                {requestSuccess && (
+                  <div className="rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs text-emerald-700 flex items-center gap-1.5 mb-4">
+                    <CheckCircle2 className="size-4 shrink-0 text-emerald-600" />
+                    <span>{requestSuccess}</span>
+                  </div>
+                )}
+
+                <form onSubmit={handlePostRequest} className="space-y-4">
+                  {/* Origin Address and City Input Fields */}
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-2">
+                      <Label htmlFor="reqOriginAddress" className="text-xs font-semibold text-neutral-700">Start Address</Label>
+                      <Input
+                        id="reqOriginAddress"
+                        placeholder="e.g. LUMS Campus"
+                        value={reqOriginAddress}
+                        onChange={(e) => setReqOriginAddress(e.target.value)}
+                        className="h-10 bg-white text-xs"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="reqOriginCity" className="text-xs font-semibold text-neutral-700">Start City</Label>
+                      <Input
+                        id="reqOriginCity"
+                        placeholder="Lahore"
+                        value={reqOriginCity}
+                        onChange={(e) => setReqOriginCity(e.target.value)}
+                        className="h-10 bg-white text-xs"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Destination Address and City Input Fields */}
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-2">
+                      <Label htmlFor="reqDestAddress" className="text-xs font-semibold text-neutral-700">Dest Address</Label>
+                      <Input
+                        id="reqDestAddress"
+                        placeholder="e.g. DHA Phase 5"
+                        value={reqDestAddress}
+                        onChange={(e) => setReqDestAddress(e.target.value)}
+                        className="h-10 bg-white text-xs"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="reqDestCity" className="text-xs font-semibold text-neutral-700">Dest City</Label>
+                      <Input
+                        id="reqDestCity"
+                        placeholder="Lahore"
+                        value={reqDestCity}
+                        onChange={(e) => setReqDestCity(e.target.value)}
+                        className="h-10 bg-white text-xs"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-2">
+                      <Label htmlFor="seatsNeeded" className="text-xs font-semibold text-neutral-700">Seats Needed</Label>
+                      <Input
+                        id="seatsNeeded"
+                        type="number"
+                        min="1"
+                        max="8"
+                        value={seatsNeeded}
+                        onChange={(e) => setSeatsNeeded(e.target.value)}
+                        className="h-10 bg-white text-xs"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="proposedPrice" className="text-xs font-semibold text-neutral-700">Proposed Price (Rs.)</Label>
+                      <Input
+                        id="proposedPrice"
+                        type="number"
+                        min="0"
+                        value={proposedPrice}
+                        onChange={(e) => setProposedPrice(e.target.value)}
+                        className="h-10 bg-white text-xs"
+                      />
+                    </div>
+                  </div>
+
+                  <Button 
+                    type="submit" 
+                    disabled={isRequesting} 
+                    className="w-full h-11 bg-brand-600 text-white hover:bg-brand-700 rounded-xl font-bold text-xs"
+                  >
+                    {isRequesting ? (
+                      <>
+                        <Loader2 className="size-4 animate-spin mr-1.5" />
+                        Requesting Route...
+                      </>
+                    ) : (
+                      "Request Route"
                     )}
                   </Button>
                 </form>
