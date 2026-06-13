@@ -3,6 +3,7 @@ import { connectDB } from "@/lib/database";
 import { User } from "@/lib/models/User";
 import { Ride } from "@/lib/models/Ride";
 import { Booking } from "@/lib/models/Booking";
+import { RideRequest } from "@/lib/models/RideRequest";
 import { requireAuth, isNextResponse } from "@/lib/auth-api";
 
 export async function GET(req: Request) {
@@ -19,6 +20,19 @@ export async function GET(req: Request) {
     const totalPassengers = await User.countDocuments({ role: "passenger" });
     const totalRides = await Ride.countDocuments();
     const activeRequests = await Booking.countDocuments({ status: "pending" });
+
+    // Additional Performance & Analytics metrics
+    const totalBookings = await Booking.countDocuments();
+    const acceptedBookings = await Booking.countDocuments({ status: "accepted" });
+    const rejectedBookings = await Booking.countDocuments({ status: "rejected" });
+    const cancelledBookings = await Booking.countDocuments({ status: "cancelled" });
+    const bookingSuccessRate = totalBookings > 0
+      ? Number(((acceptedBookings / totalBookings) * 100).toFixed(1))
+      : 0;
+
+    const totalRideRequests = await RideRequest.countDocuments();
+    const pendingRideRequests = await RideRequest.countDocuments({ status: "pending" });
+    const acceptedRideRequests = await RideRequest.countDocuments({ status: "accepted" });
 
     // Generate daily trend labels for the last 7 days
     const dailyLabels: string[] = [];
@@ -61,6 +75,14 @@ export async function GET(req: Request) {
       totalPassengers,
       totalRides,
       activeRequests,
+      totalBookings,
+      acceptedBookings,
+      rejectedBookings,
+      cancelledBookings,
+      bookingSuccessRate,
+      totalRideRequests,
+      pendingRideRequests,
+      acceptedRideRequests,
       usersTrend,
       ridesTrend,
       recentUsers: recentUsersList,

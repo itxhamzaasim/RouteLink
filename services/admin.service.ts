@@ -7,6 +7,14 @@ export interface AdminStats {
   totalPassengers: number;
   totalRides: number;
   activeRequests: number;
+  totalBookings: number;
+  acceptedBookings: number;
+  rejectedBookings: number;
+  cancelledBookings: number;
+  bookingSuccessRate: number;
+  totalRideRequests: number;
+  pendingRideRequests: number;
+  acceptedRideRequests: number;
   usersTrend: { label: string; count: number }[];
   ridesTrend: { label: string; count: number }[];
   recentUsers: User[];
