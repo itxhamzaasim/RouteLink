@@ -73,6 +73,13 @@ export function DashboardSidebar() {
     if (item.href === "/dashboard/rides" && user?.role === "passenger") {
       return { label: "My Commute Bookings", href: item.href, icon: item.icon };
     }
+    if (item.href === "/dashboard/search") {
+      if (user?.role === "passenger") {
+        return { label: "Available Rides", href: item.href, icon: item.icon };
+      } else {
+        return { label: "Requested Rides", href: "/dashboard/requested-rides", icon: item.icon };
+      }
+    }
     return {
       label: item.label,
       href: item.href,

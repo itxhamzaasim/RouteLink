@@ -87,9 +87,6 @@ export default function RidesPage() {
         } else if (activeTab === "incoming") {
           const data = await bookingService.getDriverBookings(token);
           setIncomingBookings(data);
-        } else if (activeTab === "requests") {
-          const data = await rideService.getRideRequests(token);
-          setRequests(data);
         }
       }
     } catch (err: any) {
@@ -352,16 +349,6 @@ export default function RidesPage() {
               }`}
             >
               Incoming Ride Requests
-            </button>
-            <button
-              onClick={() => setActiveTab("requests")}
-              className={`px-4 py-2 text-sm font-semibold border-b-2 transition-colors cursor-pointer ${
-                activeTab === "requests"
-                  ? "border-brand-600 text-brand-600"
-                  : "border-transparent text-neutral-500 hover:text-neutral-900"
-              }`}
-            >
-              Passenger Requests
             </button>
           </>
         )}
