@@ -90,7 +90,7 @@ export function RecentRides() {
                 </div>
                 <div>
                   <p className="font-medium text-neutral-900">
-                    {ride.origin.city} &rarr; {ride.destination.city}
+                    {ride.origin.address} &rarr; {ride.destination.address}
                   </p>
                   <p className="mt-0.5 text-sm text-neutral-500">
                     {formatDateTime(ride.departureTime)} &middot; {ride.driverName}

@@ -117,8 +117,8 @@ export function BookingFormModal({
                 <MapPin className="size-4 text-brand-600 mt-0.5 shrink-0" />
                 <div>
                   <p className="text-xs text-neutral-400">Route</p>
-                  <p className="font-medium text-neutral-900">{ride.origin.city} &rarr; {ride.destination.city}</p>
-                  <p className="text-xs text-neutral-500">{ride.origin.address} &middot; {ride.destination.address}</p>
+                  <p className="font-medium text-neutral-900">{ride.origin.address} &rarr; {ride.destination.address}</p>
+                  <p className="text-xs text-neutral-500">{ride.origin.city} &middot; {ride.destination.city}</p>
                 </div>
               </div>
               <div className="flex items-center gap-2">

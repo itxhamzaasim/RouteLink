@@ -431,9 +431,9 @@ export default function DashboardPage() {
                       <div key={ride.id} className="p-4 hover:bg-neutral-50/50 transition-colors text-xs space-y-2">
                         <div className="flex justify-between items-start">
                           <div className="flex items-center gap-1.5 font-bold text-neutral-900">
-                            <span>{ride.origin.city}</span>
+                            <span>{ride.origin.address}</span>
                             <ArrowRight className="size-3 text-neutral-400" />
-                            <span>{ride.destination.city}</span>
+                            <span>{ride.destination.address}</span>
                           </div>
                           <Badge variant="outline" className="bg-emerald-50 text-emerald-700 border-emerald-200">
                             {ride.availableSeats} seats left
@@ -470,7 +470,7 @@ export default function DashboardPage() {
                     <div>
                       <span className="text-[10px] uppercase font-bold text-brand-600 tracking-wider">Selected Route Booking</span>
                       <h3 className="text-base font-extrabold text-neutral-900 flex items-center gap-2 mt-0.5">
-                        {selectedRide.origin.city} <ArrowRight className="size-4 text-brand-500" /> {selectedRide.destination.city}
+                        {selectedRide.origin.address} <ArrowRight className="size-4 text-brand-500" /> {selectedRide.destination.address}
                       </h3>
                     </div>
                     <Button 
@@ -568,9 +568,9 @@ export default function DashboardPage() {
                       <div key={ride.id} className="flex justify-between items-center p-4 hover:bg-neutral-50/50 transition-colors text-xs">
                         <div className="space-y-1">
                           <div className="flex items-center gap-1.5 font-bold text-neutral-900">
-                            <span>{ride.origin.city}</span>
+                            <span>{ride.origin.address}</span>
                             <ArrowRight className="size-3 text-neutral-400" />
-                            <span>{ride.destination.city}</span>
+                            <span>{ride.destination.address}</span>
                           </div>
                           <div className="flex flex-wrap items-center gap-3 text-neutral-500 text-[11px]">
                             <span>Driver: {ride.driverName}</span>
@@ -879,7 +879,7 @@ export default function DashboardPage() {
                           {user?.role === "driver" ? req.passengerName : req.rideDetails.driverName}
                         </div>
                         <div className="text-neutral-500 text-[10px] mt-0.5">
-                          Route: {req.rideDetails.origin.city} &rarr; {req.rideDetails.destination.city}
+                          Route: {req.rideDetails.origin.address} &rarr; {req.rideDetails.destination.address}
                         </div>
                       </div>
                       <Badge variant="outline" className={`text-[10px] font-semibold ${STATUS_COLORS[req.status]}`}>
