@@ -1,0 +1,30 @@
+export const APP_NAME = "RouteLink";
+export const APP_TAGLINE = "Share rides. Save money. Go further.";
+
+export const ROUTES = {
+  home: "/",
+  login: "/login",
+  register: "/register",
+  dashboard: "/dashboard",
+  dashboardRides: "/dashboard/rides",
+  dashboardBookings: "/dashboard/bookings",
+  dashboardProfile: "/dashboard/profile",
+  dashboardSettings: "/dashboard/settings",
+} as const;
+
+export const AUTH_COOKIE_NAME = "routelink-session";
+export const AUTH_STORAGE_KEY = "routelink-auth";
+
+export const NAV_LINKS = [
+  { label: "Find a ride", href: "#search" },
+  { label: "Offer a ride", href: "#offer" },
+  { label: "How it works", href: "#how-it-works" },
+] as const;
+
+export const DASHBOARD_NAV = [
+  { label: "Overview", href: ROUTES.dashboard, icon: "LayoutDashboard" },
+  { label: "My Rides", href: ROUTES.dashboardRides, icon: "Car" },
+  { label: "Bookings", href: ROUTES.dashboardBookings, icon: "Ticket" },
+  { label: "Profile", href: ROUTES.dashboardProfile, icon: "User" },
+  { label: "Settings", href: ROUTES.dashboardSettings, icon: "Settings" },
+] as const;
