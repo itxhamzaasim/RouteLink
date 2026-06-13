@@ -7,10 +7,14 @@ export interface IRide extends Document {
   origin: {
     address: string;
     city: string;
+    lat?: number;
+    lng?: number;
   };
   destination: {
     address: string;
     city: string;
+    lat?: number;
+    lng?: number;
   };
   departureTime: Date;
   availableSeats: number;
@@ -54,6 +58,12 @@ const RideSchema = new Schema<IRide>(
         trim: true,
         index: true,
       },
+      lat: {
+        type: Number,
+      },
+      lng: {
+        type: Number,
+      },
     },
     destination: {
       address: {
@@ -66,6 +76,12 @@ const RideSchema = new Schema<IRide>(
         required: [true, "Destination city is required"],
         trim: true,
         index: true,
+      },
+      lat: {
+        type: Number,
+      },
+      lng: {
+        type: Number,
       },
     },
     departureTime: {

@@ -7,7 +7,19 @@ import { authService } from "@/services/auth.service";
 import { rideService } from "@/services/ride.service";
 import { bookingService } from "@/services/booking.service";
 import { notificationService } from "@/services/notification.service";
-import { LahoreMap, LAHORE_NODES, type MapNode } from "@/components/dashboard/lahore-map";
+import dynamic from "next/dynamic";
+
+const RealLahoreMap = dynamic(() => import("@/components/dashboard/real-lahore-map"), {
+  ssr: false,
+  loading: () => (
+    <div className="w-full h-[320px] sm:h-[400px] flex items-center justify-center bg-neutral-50 rounded-2xl border border-neutral-200">
+      <div className="flex flex-col items-center gap-2 text-neutral-400">
+        <Loader2 className="size-6 animate-spin text-neutral-400" />
+        <span className="text-xs">Loading Live Lahore Map...</span>
+      </div>
+    </div>
+  ),
+});
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
@@ -39,9 +51,9 @@ export default function DashboardPage() {
   const [bookingSuccess, setBookingSuccess] = useState("");
   const [isBooking, setIsBooking] = useState(false);
 
-  // Rider creation states
-  const [startNode, setStartNode] = useState<MapNode | null>(null);
-  const [destNode, setDestNode] = useState<MapNode | null>(null);
+  // Rider/commuter location states
+  const [startLocation, setStartLocation] = useState<{ address: string; city: string; lat: number; lng: number } | null>(null);
+  const [destLocation, setDestLocation] = useState<{ address: string; city: string; lat: number; lng: number } | null>(null);
   const [departureTime, setDepartureTime] = useState("");
   const [availableSeats, setAvailableSeats] = useState("4");
   const [pricePerSeat, setPricePerSeat] = useState("500");
@@ -133,7 +145,7 @@ export default function DashboardPage() {
   // Handle rider posting new ride
   const handlePostRide = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!startNode || !destNode) {
+    if (!startLocation || !destLocation) {
       setError("Please select both a Start point and a Destination on the Lahore map.");
       return;
     }
@@ -160,12 +172,16 @@ export default function DashboardPage() {
       const token = JSON.parse(rawAuth).accessToken;
       const payload = {
         origin: {
-          address: startNode.name,
-          city: startNode.name
+          address: startLocation.address,
+          city: startLocation.city,
+          lat: startLocation.lat,
+          lng: startLocation.lng,
         },
         destination: {
-          address: destNode.name,
-          city: destNode.name
+          address: destLocation.address,
+          city: destLocation.city,
+          lat: destLocation.lat,
+          lng: destLocation.lng,
         },
         departureTime: departureTime,
         availableSeats: Number(availableSeats),
@@ -179,8 +195,8 @@ export default function DashboardPage() {
 
       await rideService.createRide(payload, token);
       setRideSuccess("Ride posted successfully!");
-      setStartNode(null);
-      setDestNode(null);
+      setStartLocation(null);
+      setDestLocation(null);
       setDepartureTime("");
       await loadDashboardData();
     } catch (err: any) {
@@ -243,14 +259,39 @@ export default function DashboardPage() {
     }
   };
 
-  // Select start/destination nodes on the map
-  const handleSelectNode = (type: "start" | "dest", node: MapNode | null) => {
+  // Select start/destination locations on the map
+  const handleSelectLocation = (
+    type: "start" | "dest",
+    location: { address: string; city: string; lat: number; lng: number } | null
+  ) => {
     if (type === "start") {
-      setStartNode(node);
+      setStartLocation(location);
     } else {
-      setDestNode(node);
+      setDestLocation(location);
     }
     setError("");
+  };
+
+  // Handle passenger selecting a ride from map or list
+  const handleSelectRide = (ride: Ride) => {
+    setSelectedRide(ride);
+    if (ride.origin?.lat && ride.origin?.lng && ride.destination?.lat && ride.destination?.lng) {
+      setStartLocation({
+        address: ride.origin.address,
+        city: ride.origin.city,
+        lat: ride.origin.lat,
+        lng: ride.origin.lng,
+      });
+      setDestLocation({
+        address: ride.destination.address,
+        city: ride.destination.city,
+        lat: ride.destination.lat,
+        lng: ride.destination.lng,
+      });
+    } else {
+      setStartLocation(null);
+      setDestLocation(null);
+    }
   };
 
   // Mark notification read
@@ -355,22 +396,21 @@ export default function DashboardPage() {
           {user?.role === "driver" ? (
             /* DRIVER VIEW */
             <div className="space-y-6">
-              {/* SVG Map Selection instructions */}
+              {/* Real Interactive Map for Route Posting */}
               <div className="rounded-2xl border border-neutral-200 bg-white p-4 shadow-xs">
                 <h2 className="text-sm font-bold text-neutral-800 mb-1 flex items-center gap-2">
                   <MapPin className="size-4 text-emerald-500" />
                   Step 1: Select Your Route On The Lahore Map
                 </h2>
-                <p className="text-xs text-neutral-500 leading-normal">
-                  Click any node to set your starting hub, and another node to mark your destination. Click the nodes again to reset.
+                <p className="text-xs text-neutral-500 leading-normal mb-3">
+                  Click two locations on the map, or use search suggestions below to set your Start and Destination points.
                 </p>
-                <div className="mt-3">
-                  <LahoreMap 
-                    startNodeId={startNode?.id} 
-                    destNodeId={destNode?.id} 
-                    onSelectNode={handleSelectNode}
-                  />
-                </div>
+                <RealLahoreMap 
+                  startLocation={startLocation}
+                  destLocation={destLocation}
+                  onSelectLocation={handleSelectLocation}
+                  interactive={true}
+                />
               </div>
 
               {/* Driver Posted Rides list */}
@@ -433,21 +473,17 @@ export default function DashboardPage() {
                   <MapPin className="size-4 text-brand-500" />
                   Interactive Commute Feed
                 </h2>
-                <p className="text-xs text-neutral-500 leading-normal">
-                  Click on any glowing route vector line on the map to inspect driver schedules and make booking requests.
+                <p className="text-xs text-neutral-500 leading-normal mb-3">
+                  Click on any ride marker on the map to inspect driver schedules and view calculated driving routes.
                 </p>
-                <div className="mt-3">
-                  <LahoreMap 
-                    activeRoutes={activeRides.map((ride) => ({
-                      id: ride.id,
-                      originCity: ride.origin.city,
-                      destinationCity: ride.destination.city,
-                      driverName: ride.driverName,
-                      onSelect: () => setSelectedRide(ride)
-                    }))}
-                    interactive={false}
-                  />
-                </div>
+                <RealLahoreMap 
+                  startLocation={startLocation}
+                  destLocation={destLocation}
+                  onSelectLocation={handleSelectLocation}
+                  activeRides={activeRides}
+                  onSelectRide={handleSelectRide}
+                  interactive={true}
+                />
               </div>
 
               {/* Ride Booking Detail Modal Overlay / Sidebar detail Card */}
@@ -463,7 +499,11 @@ export default function DashboardPage() {
                     <Button 
                       variant="ghost" 
                       size="sm" 
-                      onClick={() => setSelectedRide(null)}
+                      onClick={() => {
+                        setSelectedRide(null);
+                        setStartLocation(null);
+                        setDestLocation(null);
+                      }}
                       className="size-7 p-0 rounded-full hover:bg-neutral-200 text-neutral-500"
                     >
                       <X className="size-4" />
@@ -571,7 +611,7 @@ export default function DashboardPage() {
                           </div>
                         </div>
                         <Button 
-                          onClick={() => setSelectedRide(ride)}
+                          onClick={() => handleSelectRide(ride)}
                           size="sm"
                           variant="outline" 
                           className="h-8 text-xs font-semibold rounded-lg hover:bg-neutral-100"
@@ -607,18 +647,18 @@ export default function DashboardPage() {
                 )}
 
                 <form onSubmit={handlePostRide} className="space-y-4">
-                  {/* Selected Nodes readout */}
+                  {/* Selected Locations readout */}
                   <div className="rounded-xl border border-neutral-100 bg-neutral-50/50 p-3 text-xs space-y-2">
-                    <div className="flex justify-between items-center">
-                      <span className="text-neutral-400 font-medium">Start Node:</span>
-                      <span className={startNode ? "text-emerald-600 font-bold" : "text-neutral-400 italic"}>
-                        {startNode ? startNode.name : "Click map node"}
+                    <div className="flex flex-col gap-1">
+                      <span className="text-[10px] text-neutral-400 font-bold uppercase">Start Hub:</span>
+                      <span className={startLocation ? "text-emerald-600 font-bold break-words" : "text-neutral-400 italic"}>
+                        {startLocation ? startLocation.address : "Select on map or search"}
                       </span>
                     </div>
-                    <div className="flex justify-between items-center border-t border-neutral-100 pt-2">
-                      <span className="text-neutral-400 font-medium">Destination:</span>
-                      <span className={destNode ? "text-red-600 font-bold" : "text-neutral-400 italic"}>
-                        {destNode ? destNode.name : "Click map node"}
+                    <div className="flex flex-col gap-1 border-t border-neutral-100 pt-2">
+                      <span className="text-[10px] text-neutral-400 font-bold uppercase">Destination Hub:</span>
+                      <span className={destLocation ? "text-red-600 font-bold break-words" : "text-neutral-400 italic"}>
+                        {destLocation ? destLocation.address : "Select on map or search"}
                       </span>
                     </div>
                   </div>
