@@ -8,10 +8,12 @@ import {
   Settings,
   Ticket,
   User,
+  ShieldCheck,
 } from "lucide-react";
 import { Logo } from "@/components/common/logo";
 import { DASHBOARD_NAV } from "@/lib/constants";
 import { cn } from "@/lib/utils";
+import { useAuthContext } from "@/components/providers/auth-provider";
 
 const ICON_MAP = {
   LayoutDashboard,
@@ -19,10 +21,21 @@ const ICON_MAP = {
   Ticket,
   User,
   Settings,
+  ShieldCheck,
 } as const;
 
 export function DashboardSidebar() {
   const pathname = usePathname();
+  const { user } = useAuthContext();
+
+  const navItems = [...DASHBOARD_NAV];
+  if (user?.role === "admin") {
+    navItems.push({
+      label: "Admin Panel",
+      href: "/admin",
+      icon: "ShieldCheck",
+    });
+  }
 
   return (
     <aside className="hidden w-64 shrink-0 flex-col border-r bg-white lg:flex">
@@ -31,7 +44,7 @@ export function DashboardSidebar() {
       </div>
 
       <nav className="flex-1 space-y-1 p-4">
-        {DASHBOARD_NAV.map((item) => {
+        {navItems.map((item) => {
           const Icon = ICON_MAP[item.icon as keyof typeof ICON_MAP];
           const isActive =
             pathname === item.href ||

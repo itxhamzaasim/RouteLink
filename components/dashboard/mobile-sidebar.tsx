@@ -8,8 +8,10 @@ import {
   Settings,
   Ticket,
   User,
+  ShieldCheck,
 } from "lucide-react";
 import { Logo } from "@/components/common/logo";
+import { useAuthContext } from "@/components/providers/auth-provider";
 import {
   Sheet,
   SheetContent,
@@ -27,6 +29,7 @@ const ICON_MAP = {
   Ticket,
   User,
   Settings,
+  ShieldCheck,
 } as const;
 
 interface DashboardMobileNavProps {
@@ -35,6 +38,16 @@ interface DashboardMobileNavProps {
 
 export function DashboardMobileNav({ trigger }: DashboardMobileNavProps) {
   const pathname = usePathname();
+  const { user } = useAuthContext();
+
+  const navItems = [...DASHBOARD_NAV];
+  if (user?.role === "admin") {
+    navItems.push({
+      label: "Admin Panel",
+      href: "/admin",
+      icon: "ShieldCheck",
+    });
+  }
 
   return (
     <Sheet>
@@ -46,7 +59,7 @@ export function DashboardMobileNav({ trigger }: DashboardMobileNavProps) {
         </SheetHeader>
 
         <nav className="space-y-1 p-4">
-          {DASHBOARD_NAV.map((item) => {
+          {navItems.map((item) => {
             const Icon = ICON_MAP[item.icon as keyof typeof ICON_MAP];
             const isActive =
               pathname === item.href ||
