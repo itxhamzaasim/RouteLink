@@ -46,7 +46,18 @@ export default function CommunityPage() {
   // Initial load
   useEffect(() => {
     fetchMessages(true);
+
+    if (typeof window !== "undefined") {
+      localStorage.setItem("routelink-last-community-visit", new Date().toISOString());
+    }
+
+    return () => {
+      if (typeof window !== "undefined") {
+        localStorage.setItem("routelink-last-community-visit", new Date().toISOString());
+      }
+    };
   }, [user]);
+
 
   // Polling for new messages every 5 seconds
   useEffect(() => {

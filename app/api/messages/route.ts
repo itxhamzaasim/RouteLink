@@ -30,6 +30,12 @@ export async function GET(req: Request) {
     await connectDB();
     const userId = user._id.toString();
 
+    // Mark all incoming messages from this partner as read
+    await DirectMessage.updateMany(
+      { senderId: partnerId, recipientId: userId, isRead: false },
+      { $set: { isRead: true } }
+    );
+
     const messages = await DirectMessage.find({
       $or: [
         { senderId: userId, recipientId: partnerId },
@@ -46,6 +52,7 @@ export async function GET(req: Request) {
     );
   }
 }
+
 
 // POST /api/messages
 // Sends a direct message to a partner

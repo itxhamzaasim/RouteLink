@@ -1,6 +1,8 @@
 "use client";
 
+import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
+
 import { usePathname } from "next/navigation";
 import {
   Car,
@@ -11,11 +13,13 @@ import {
   ShieldCheck,
   MessageSquare,
   MessageSquareMore,
+  Search,
 } from "lucide-react";
 import { Logo } from "@/components/common/logo";
 import { DASHBOARD_NAV } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import { useAuthContext } from "@/components/providers/auth-provider";
+import { messageService } from "@/services/message.service";
 
 const ICON_MAP = {
   LayoutDashboard,
@@ -26,12 +30,38 @@ const ICON_MAP = {
   ShieldCheck,
   MessageSquare,
   MessageSquareMore,
+  Search,
 } as const;
 
 
 export function DashboardSidebar() {
   const pathname = usePathname();
   const { user } = useAuthContext();
+
+  const [unreadDMs, setUnreadDMs] = useState(0);
+  const [unreadCommunity, setUnreadCommunity] = useState(0);
+
+  const fetchUnreadCounts = useCallback(async () => {
+    if (typeof window === "undefined" || !user) return;
+    const rawAuth = localStorage.getItem("routelink-auth");
+    if (!rawAuth) return;
+
+    try {
+      const token = JSON.parse(rawAuth).accessToken;
+      const lastCommunitySeen = localStorage.getItem("routelink-last-community-visit");
+      const data = await messageService.getUnreadCounts(lastCommunitySeen, token);
+      setUnreadDMs(data.unreadDMsCount);
+      setUnreadCommunity(data.unreadCommunityCount);
+    } catch (err) {
+      console.error("Failed to fetch unread counts in sidebar:", err);
+    }
+  }, [user]);
+
+  useEffect(() => {
+    fetchUnreadCounts();
+    const interval = setInterval(fetchUnreadCounts, 5000); // Poll every 5 seconds
+    return () => clearInterval(interval);
+  }, [fetchUnreadCounts]);
 
   const navItems: { label: string; href: string; icon: string }[] = [...DASHBOARD_NAV];
   if (user?.role === "admin") {
@@ -55,19 +85,28 @@ export function DashboardSidebar() {
             pathname === item.href ||
             (item.href !== "/dashboard" && pathname.startsWith(item.href));
 
+          const hasDot = 
+            (item.label === "Messages" && unreadDMs > 0) ||
+            (item.label === "Community" && unreadCommunity > 0);
+
           return (
             <Link
               key={item.href}
               href={item.href}
               className={cn(
-                "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors",
+                "flex items-center justify-between rounded-xl px-3 py-2.5 text-sm font-medium transition-colors",
                 isActive
                   ? "bg-neutral-900 text-white"
                   : "text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900"
               )}
             >
-              <Icon className="size-5" />
-              {item.label}
+              <div className="flex items-center gap-3">
+                <Icon className="size-5" />
+                {item.label}
+              </div>
+              {hasDot && (
+                <span className="size-2 rounded-full bg-emerald-500 animate-pulse mr-1" />
+              )}
             </Link>
           );
         })}
@@ -75,4 +114,5 @@ export function DashboardSidebar() {
     </aside>
   );
 }
+
 

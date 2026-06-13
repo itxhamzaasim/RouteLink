@@ -20,8 +20,8 @@ import type {
 } from "@/types";
 
 interface AuthContextValue extends AuthState {
-  login: (credentials: LoginCredentials) => Promise<void>;
-  register: (credentials: RegisterCredentials) => Promise<void>;
+  login: (credentials: LoginCredentials, redirectTo?: string) => Promise<void>;
+  register: (credentials: RegisterCredentials, redirectTo?: string) => Promise<void>;
   logout: () => Promise<void>;
   updateUser: (user: User) => void;
 }
@@ -54,27 +54,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [hydrate]);
 
   const login = useCallback(
-    async (credentials: LoginCredentials) => {
+    async (credentials: LoginCredentials, redirectTo?: string) => {
       const session = await authService.login(credentials);
       setState({
         user: session.user,
         isAuthenticated: true,
         isLoading: false,
       });
-      router.push(ROUTES.dashboard);
+      router.push(redirectTo || ROUTES.dashboard);
     },
     [router]
   );
 
   const register = useCallback(
-    async (credentials: RegisterCredentials) => {
+    async (credentials: RegisterCredentials, redirectTo?: string) => {
       const session = await authService.register(credentials);
       setState({
         user: session.user,
         isAuthenticated: true,
         isLoading: false,
       });
-      router.push(ROUTES.dashboard);
+      router.push(redirectTo || ROUTES.dashboard);
     },
     [router]
   );

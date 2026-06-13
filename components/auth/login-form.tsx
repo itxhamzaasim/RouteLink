@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { useAuthContext } from "@/components/providers/auth-provider";
@@ -20,6 +20,17 @@ export function LoginForm() {
     email: "",
     password: "",
   });
+  const [redirectTo, setRedirectTo] = useState<string | undefined>(undefined);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const redirect = params.get("redirect");
+      if (redirect) {
+        setRedirectTo(redirect);
+      }
+    }
+  }, []);
 
   const handleChange = (field: keyof LoginCredentials, value: string) => {
     setCredentials((prev) => ({ ...prev, [field]: value }));
@@ -42,7 +53,7 @@ export function LoginForm() {
 
     setIsLoading(true);
     try {
-      await login(credentials);
+      await login(credentials, redirectTo);
     } catch {
       setFormError("Invalid email or password. Please try again.");
     } finally {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { useAuthContext } from "@/components/providers/auth-provider";
 import { Button } from "@/components/ui/button";
@@ -26,6 +26,17 @@ export function RegisterForm() {
     role: "passenger",
     acceptTerms: false,
   });
+  const [redirectTo, setRedirectTo] = useState<string | undefined>(undefined);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const redirect = params.get("redirect");
+      if (redirect) {
+        setRedirectTo(redirect);
+      }
+    }
+  }, []);
 
   const handleChange = <K extends keyof RegisterCredentials>(
     field: K,
@@ -51,7 +62,7 @@ export function RegisterForm() {
 
     setIsLoading(true);
     try {
-      await register(credentials);
+      await register(credentials, redirectTo);
     } catch {
       setFormError("Registration failed. Please try again.");
     } finally {

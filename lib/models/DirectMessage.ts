@@ -4,6 +4,7 @@ export interface IDirectMessage extends Document {
   senderId: Types.ObjectId;
   recipientId: Types.ObjectId;
   content: string;
+  isRead: boolean;
   createdAt: Date;
 }
 
@@ -26,12 +27,18 @@ const DirectMessageSchema = new Schema<IDirectMessage>(
       required: [true, "Message content is required"],
       trim: true,
     },
+    isRead: {
+      type: Boolean,
+      default: false,
+      index: true,
+    },
     createdAt: {
       type: Date,
       default: Date.now,
       index: true,
     },
   },
+
   {
     toJSON: {
       virtuals: true,

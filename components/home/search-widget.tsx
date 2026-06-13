@@ -6,6 +6,7 @@ import { ArrowRight, Calendar, MapPin, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { ROUTES } from "@/lib/constants";
 import type { RideSearchParams } from "@/types";
 
 export function SearchWidget() {
@@ -19,14 +20,25 @@ export function SearchWidget() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
     const query = new URLSearchParams();
     if (params.origin) query.append("originCity", params.origin);
     if (params.destination) query.append("destinationCity", params.destination);
     if (params.date) query.append("date", params.date);
     if (params.passengers) query.append("seats", String(params.passengers));
 
-    router.push(`/rides?${query.toString()}`);
+    if (typeof window !== "undefined") {
+      const rawAuth = localStorage.getItem("routelink-auth");
+      if (!rawAuth) {
+        const dest = `${ROUTES.dashboardSearch}?${query.toString()}`;
+        router.push(`/login?redirect=${encodeURIComponent(dest)}`);
+        return;
+      }
+    }
+
+    router.push(`${ROUTES.dashboardSearch}?${query.toString()}`);
   };
+
 
   return (
     <form

@@ -27,7 +27,7 @@ import { BookingFormModal } from "@/components/dashboard/booking-form-modal";
 import { rideService } from "@/services/ride.service";
 import type { Ride } from "@/types";
 
-function SearchResultsContent() {
+export function SearchResultsContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
 
@@ -73,11 +73,14 @@ function SearchResultsContent() {
   useEffect(() => {
     if (typeof window !== "undefined") {
       const rawAuth = localStorage.getItem("routelink-auth");
+      const currentQuery = window.location.search;
       if (!rawAuth) {
         setIsAuthenticated(false);
-        router.push(`/login?redirect=${encodeURIComponent(window.location.pathname + window.location.search)}`);
+        const redirectDest = `/dashboard/search${currentQuery}`;
+        router.push(`/login?redirect=${encodeURIComponent(redirectDest)}`);
       } else {
         setIsAuthenticated(true);
+        router.replace(`/dashboard/search${currentQuery}`);
       }
     }
   }, [router]);

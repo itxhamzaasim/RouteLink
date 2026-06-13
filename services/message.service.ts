@@ -23,4 +23,18 @@ export const messageService = {
       token,
     });
   },
+
+  async getUnreadCounts(
+    lastCommunitySeen: string | null,
+    token: string
+  ): Promise<{ unreadDMsCount: number; unreadCommunityCount: number }> {
+    const url = lastCommunitySeen
+      ? `/messages/unread?lastCommunitySeen=${encodeURIComponent(lastCommunitySeen)}`
+      : "/messages/unread";
+    return apiClient<{ unreadDMsCount: number; unreadCommunityCount: number }>(url, {
+      method: "GET",
+      token,
+    });
+  },
 };
+
