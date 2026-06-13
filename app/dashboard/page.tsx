@@ -854,75 +854,7 @@ export default function DashboardPage() {
             </Card>
           )}
 
-          {/* ACTIVE BOOKINGS / REQUESTS CARD */}
-          <Card className="border-neutral-200 shadow-sm">
-            <div className="border-b px-5 py-4 flex justify-between items-center bg-white rounded-t-2xl">
-              <h2 className="text-sm font-bold text-neutral-900">
-                {user?.role === "driver" ? "Incoming Ride Requests" : "My Commute Bookings"}
-              </h2>
-            </div>
-            <CardContent className="p-0 divide-y divide-neutral-100">
-              {isLoading ? (
-                <div className="flex h-24 items-center justify-center">
-                  <Loader2 className="size-5 animate-spin text-neutral-400" />
-                </div>
-              ) : requests.length === 0 ? (
-                <div className="py-8 text-center text-neutral-500 text-xs">
-                  {user?.role === "driver" ? "No incoming passenger bookings." : "You haven't requested any rides yet."}
-                </div>
-              ) : (
-                requests.map((req) => (
-                  <div key={req.id} className="p-4 hover:bg-neutral-50/50 transition-colors space-y-2 text-xs">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <div className="font-bold text-neutral-900 capitalize">
-                          {user?.role === "driver" ? req.passengerName : req.rideDetails.driverName}
-                        </div>
-                        <div className="text-neutral-500 text-[10px] mt-0.5">
-                          Route: {req.rideDetails.origin.address} &rarr; {req.rideDetails.destination.address}
-                        </div>
-                      </div>
-                      <Badge variant="outline" className={`text-[10px] font-semibold ${STATUS_COLORS[req.status]}`}>
-                        {req.status}
-                      </Badge>
-                    </div>
 
-                    <div className="flex justify-between items-center text-[10px] text-neutral-400">
-                      <div>
-                        {req.seatsBooked} seat(s) &middot; Rs. {req.totalPrice}
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <Clock className="size-3" />
-                        {new Date(req.rideDetails.departureTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                      </div>
-                    </div>
-
-                    {user?.role === "driver" && req.status === "pending" && (
-                      <div className="flex gap-2 pt-1.5">
-                        <Button
-                          onClick={() => handleAccept(req.id)}
-                          size="sm"
-                          className="h-8 flex-1 bg-brand-600 hover:bg-brand-700 text-white text-[11px] font-bold rounded-lg flex items-center justify-center gap-1"
-                        >
-                          <Check className="size-3" />
-                          Accept
-                        </Button>
-                        <Button
-                          onClick={() => handleReject(req.id)}
-                          size="sm"
-                          variant="ghost"
-                          className="h-8 flex-1 text-red-600 hover:text-red-700 hover:bg-red-50 border border-neutral-100 text-[11px] font-bold rounded-lg flex items-center justify-center gap-1"
-                        >
-                          <X className="size-3" />
-                          Decline
-                        </Button>
-                      </div>
-                    )}
-                  </div>
-                ))
-              )}
-            </CardContent>
-          </Card>
 
           {/* Activity Log / Feed */}
           <div className="rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm space-y-4">

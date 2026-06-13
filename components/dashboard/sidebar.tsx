@@ -66,7 +66,16 @@ export function DashboardSidebar() {
     return () => clearInterval(interval);
   }, [fetchUnreadCounts]);
 
-  const navItems: { label: string; href: string; icon: string }[] = [...DASHBOARD_NAV];
+  const navItems: Array<{ label: string; href: string; icon: string }> = DASHBOARD_NAV.map((item) => {
+    if (item.href === "/dashboard/rides" && user?.role === "passenger") {
+      return { label: "My Commute Bookings", href: item.href, icon: item.icon };
+    }
+    return {
+      label: item.label,
+      href: item.href,
+      icon: item.icon,
+    };
+  });
   if (user?.role === "admin") {
     navItems.push({
       label: "Admin Panel",

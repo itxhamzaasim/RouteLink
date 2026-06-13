@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import { Send, Loader2, MessageSquare, Car, User, Search, Shield } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -9,8 +10,14 @@ import { useAuthContext } from "@/components/providers/auth-provider";
 import { messageService } from "@/services/message.service";
 import type { ChatPartner, DirectMessage } from "@/types";
 
-export default function MessagesPage() {
+function MessagesContent() {
   const { user } = useAuthContext();
+  const searchParams = useSearchParams();
+  const paramUserId = searchParams.get("userId");
+  const paramName = searchParams.get("name");
+  const paramRole = searchParams.get("role");
+  const paramAutoMessage = searchParams.get("autoMessage");
+
   const [partners, setPartners] = useState<ChatPartner[]>([]);
   const [selectedPartner, setSelectedPartner] = useState<ChatPartner | null>(null);
   const [messages, setMessages] = useState<DirectMessage[]>([]);
@@ -21,6 +28,7 @@ export default function MessagesPage() {
   const [searchQuery, setSearchQuery] = useState("");
 
   const chatEndRef = useRef<HTMLDivElement>(null);
+  const autoMessageSentRef = useRef(false);
 
   // Fetch partners on load
   useEffect(() => {
@@ -31,8 +39,40 @@ export default function MessagesPage() {
 
       try {
         const token = JSON.parse(rawAuth).accessToken;
-        const data = await messageService.getChatPartners(token);
-        setPartners(data);
+        let data = await messageService.getChatPartners(token);
+        
+        if (paramUserId && paramName && paramRole) {
+          const exists = data.some((p) => p.id === paramUserId);
+          const targetPartner = {
+            id: paramUserId,
+            name: paramName,
+            role: paramRole,
+          };
+          if (!exists) {
+            data = [targetPartner, ...data];
+          }
+          setPartners(data);
+
+          if (paramAutoMessage && !autoMessageSentRef.current) {
+            autoMessageSentRef.current = true;
+            try {
+              // Send the autoMessage immediately
+              await messageService.sendDirectMessage(
+                paramUserId,
+                paramAutoMessage,
+                token
+              );
+            } catch (err) {
+              console.error("Failed to send auto message:", err);
+            }
+            // Clear search params from URL without reloading
+            window.history.replaceState(null, "", window.location.pathname);
+          }
+          
+          setSelectedPartner(targetPartner);
+        } else {
+          setPartners(data);
+        }
       } catch (err) {
         console.error("Failed to load chat partners:", err);
       } finally {
@@ -40,7 +80,7 @@ export default function MessagesPage() {
       }
     };
     fetchPartners();
-  }, [user]);
+  }, [user, paramUserId, paramName, paramRole, paramAutoMessage]);
 
   // Fetch messages when selectedPartner changes
   const fetchMessages = async (showLoading = false) => {
@@ -326,3 +366,16 @@ export default function MessagesPage() {
     </div>
   );
 }
+
+export default function MessagesPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex h-[calc(100vh-8rem)] items-center justify-center bg-white border border-neutral-200 rounded-2xl shadow-sm">
+        <Loader2 className="size-8 animate-spin text-brand-600" />
+      </div>
+    }>
+      <MessagesContent />
+    </Suspense>
+  );
+}
+
