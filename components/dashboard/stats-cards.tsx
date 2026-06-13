@@ -46,7 +46,7 @@ export function StatsCards() {
           },
           {
             label: "Total Earnings",
-            value: `$${totalEarnings}`,
+            value: `Rs. ${totalEarnings}`,
             change: `${acceptedBookings.length} bookings accepted`,
             icon: DollarSign,
             color: "text-brand-600 bg-brand-50",
@@ -88,7 +88,7 @@ export function StatsCards() {
           },
           {
             label: "Total Spendings",
-            value: `$${totalSpendings}`,
+            value: `Rs. ${totalSpendings}`,
             change: `${bookings.length} requests made`,
             icon: DollarSign,
             color: "text-brand-600 bg-brand-50",

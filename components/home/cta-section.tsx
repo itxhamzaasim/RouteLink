@@ -1,13 +1,22 @@
+"use client";
+
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ROUTES } from "@/lib/constants";
+import { motion } from "framer-motion";
 
 export function CtaSection() {
   return (
     <section className="bg-neutral-950 py-20 sm:py-28">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-brand-600 to-brand-800 px-8 py-16 sm:px-16 sm:py-20">
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.95 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-brand-600 to-brand-800 px-8 py-16 sm:px-16 sm:py-20"
+        >
           <div
             className="absolute inset-0 opacity-30"
             style={{
@@ -22,7 +31,7 @@ export function CtaSection() {
               Ready to start your journey?
             </h2>
             <p className="mt-4 text-lg text-brand-100">
-              Join millions of riders and drivers. Create your free account in
+              Join thousands of students and office workers in Lahore. Create your free account in
               under a minute.
             </p>
             <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
@@ -44,7 +53,7 @@ export function CtaSection() {
               </Button>
             </div>
           </div>
-        </div>
+        </motion.div>
       </div>
     </section>
   );

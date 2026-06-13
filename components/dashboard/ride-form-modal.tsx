@@ -220,7 +220,7 @@ export function RideFormModal({
                 <Label htmlFor="originAddress">Source Address</Label>
                 <Input
                   id="originAddress"
-                  placeholder="e.g. 100 Main St"
+                  placeholder="e.g. Sector H, DHA Phase 6"
                   value={formData.originAddress}
                   onChange={(e) => handleChange("originAddress", e.target.value)}
                   className="h-10"
@@ -233,7 +233,7 @@ export function RideFormModal({
                 <Label htmlFor="originCity">Source City</Label>
                 <Input
                   id="originCity"
-                  placeholder="e.g. San Francisco"
+                  placeholder="e.g. Lahore"
                   value={formData.originCity}
                   onChange={(e) => handleChange("originCity", e.target.value)}
                   className="h-10"
@@ -249,7 +249,7 @@ export function RideFormModal({
                 <Label htmlFor="destinationAddress">Destination Address</Label>
                 <Input
                   id="destinationAddress"
-                  placeholder="e.g. 500 University Ave"
+                  placeholder="e.g. Sector Y, Johar Town"
                   value={formData.destinationAddress}
                   onChange={(e) => handleChange("destinationAddress", e.target.value)}
                   className="h-10"
@@ -262,7 +262,7 @@ export function RideFormModal({
                 <Label htmlFor="destinationCity">Destination City</Label>
                 <Input
                   id="destinationCity"
-                  placeholder="e.g. Berkeley"
+                  placeholder="e.g. Lahore"
                   value={formData.destinationCity}
                   onChange={(e) => handleChange("destinationCity", e.target.value)}
                   className="h-10"
@@ -325,7 +325,7 @@ export function RideFormModal({
                 )}
               </div>
               <div className="space-y-1">
-                <Label htmlFor="pricePerSeat">Price per Seat ($)</Label>
+                <Label htmlFor="pricePerSeat">Price per Seat (Rs.)</Label>
                 <Input
                   id="pricePerSeat"
                   type="number"

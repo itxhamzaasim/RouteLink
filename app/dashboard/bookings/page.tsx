@@ -119,7 +119,7 @@ export default function BookingsPage() {
                       {booking.status}
                     </Badge>
                     <span className="text-lg font-bold text-neutral-950">
-                      ${booking.totalPrice}
+                      Rs. {booking.totalPrice}
                     </span>
                   </div>
 

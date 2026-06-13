@@ -102,7 +102,7 @@ export function RecentRides() {
                   {ride.status.replace("_", " ")}
                 </Badge>
                 <span className="text-sm font-semibold text-neutral-900">
-                  ${ride.pricePerSeat}
+                  Rs. {ride.pricePerSeat}
                 </span>
               </div>
             </div>

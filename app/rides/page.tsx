@@ -317,7 +317,7 @@ function SearchResultsContent() {
                         </div>
                       </div>
                       <div className="text-right">
-                        <span className="text-2xl font-black text-neutral-950">${ride.pricePerSeat}</span>
+                        <span className="text-2xl font-black text-neutral-950">Rs. {ride.pricePerSeat}</span>
                         <span className="text-xs text-neutral-500 block">per seat</span>
                       </div>
                     </div>

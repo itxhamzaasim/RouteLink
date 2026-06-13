@@ -150,9 +150,9 @@ export function BookingFormModal({
               <div className="flex items-center justify-between bg-brand-50/20 border border-brand-100 p-4 rounded-xl">
                 <div>
                   <p className="text-xs text-brand-800 uppercase font-bold tracking-wider">Estimated Cost</p>
-                  <p className="text-2xl font-black text-brand-900 mt-0.5">${seatsBooked * ride.pricePerSeat}</p>
+                  <p className="text-2xl font-black text-brand-900 mt-0.5">Rs. {seatsBooked * ride.pricePerSeat}</p>
                 </div>
-                <span className="text-xs text-brand-600 font-medium">${ride.pricePerSeat} / seat</span>
+                <span className="text-xs text-brand-600 font-medium">Rs. {ride.pricePerSeat} / seat</span>
               </div>
             </div>
 

@@ -176,7 +176,7 @@ export default function DashboardPage() {
                             Route: <strong className="text-neutral-800">{req.rideDetails.origin.city} &rarr; {req.rideDetails.destination.city}</strong>
                           </p>
                           <p className="text-xs text-neutral-400">
-                            Booked {req.seatsBooked} seat(s) &middot; Total Price: ${req.totalPrice}
+                            Booked {req.seatsBooked} seat(s) &middot; Total Price: Rs. {req.totalPrice}
                           </p>
                         </div>
 

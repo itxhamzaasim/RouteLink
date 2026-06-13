@@ -165,9 +165,8 @@ export default function AdminReportsPage() {
                   <td className="px-6 py-4">
                     <div className="space-y-0.5 text-xs">
                       <div className="text-neutral-200 font-medium">{b.seatsBooked} seat(s)</div>
-                      <div className="flex items-center text-[10px] text-neutral-500">
-                        <DollarSign className="size-3 text-neutral-500" />
-                        <span>${b.totalPrice} total</span>
+                      <div className="flex items-center text-[10px] text-neutral-500 font-semibold">
+                        <span>Rs. {b.totalPrice} total</span>
                       </div>
                     </div>
                   </td>

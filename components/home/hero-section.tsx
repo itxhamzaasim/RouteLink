@@ -1,3 +1,6 @@
+"use client";
+
+import { motion } from "framer-motion";
 import { SearchWidget } from "@/components/home/search-widget";
 import { APP_TAGLINE } from "@/lib/constants";
 import { Badge } from "@/components/ui/badge";
@@ -19,28 +22,43 @@ export function HeroSection() {
       />
 
       <div className="relative mx-auto max-w-7xl px-4 pt-12 pb-20 sm:px-6 sm:pt-16 sm:pb-28 lg:px-8 lg:pt-20">
-        <div className="mx-auto max-w-3xl text-center">
+        <motion.div 
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, ease: "easeOut" }}
+          className="mx-auto max-w-3xl text-center"
+        >
           <Badge className="mb-6 border-white/20 bg-white/10 text-white hover:bg-white/10">
-            Trusted by 2M+ riders worldwide
+            Designed for Lahore Commuters
           </Badge>
           <h1 className="text-4xl font-bold tracking-tight text-white sm:text-5xl lg:text-6xl">
             Your journey,{" "}
             <span className="text-brand-400">shared smarter</span>
           </h1>
           <p className="mt-6 text-lg leading-relaxed text-neutral-300 sm:text-xl">
-            {APP_TAGLINE} Book affordable rides or earn by sharing your route
+            {APP_TAGLINE} Book affordable rides in Lahore or earn by sharing your route
             with fellow travelers.
           </p>
-        </div>
+        </motion.div>
 
-        <div className="mx-auto mt-12 max-w-4xl">
+        <motion.div 
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, delay: 0.2, ease: "easeOut" }}
+          className="mx-auto mt-12 max-w-4xl"
+        >
           <SearchWidget />
-        </div>
+        </motion.div>
 
-        <div className="mx-auto mt-12 grid max-w-3xl grid-cols-3 gap-6 text-center">
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.8, delay: 0.4 }}
+          className="mx-auto mt-12 grid max-w-3xl grid-cols-3 gap-6 text-center"
+        >
           {[
-            { value: "2M+", label: "Active users" },
-            { value: "50K+", label: "Daily rides" },
+            { value: "15K+", label: "Commuters" },
+            { value: "30K+", label: "Shared rides" },
             { value: "4.9", label: "Average rating" },
           ].map((stat) => (
             <div key={stat.label}>
@@ -50,7 +68,7 @@ export function HeroSection() {
               <p className="mt-1 text-sm text-neutral-400">{stat.label}</p>
             </div>
           ))}
-        </div>
+        </motion.div>
       </div>
     </section>
   );

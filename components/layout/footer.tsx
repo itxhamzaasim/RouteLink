@@ -10,7 +10,7 @@ const FOOTER_LINKS = {
     { label: "How it works", href: "#how-it-works" },
   ],
   Company: [
-    { label: "About", href: "#" },
+    { label: "About RouteLink", href: "/about" },
     { label: "Careers", href: "#" },
     { label: "Press", href: "#" },
   ],
@@ -34,8 +34,7 @@ export function Footer() {
           <div className="lg:col-span-2">
             <Logo variant="light" />
             <p className="mt-4 max-w-xs text-sm leading-relaxed text-neutral-400">
-              {APP_TAGLINE} Connect with drivers and passengers across your city
-              and beyond.
+              {APP_TAGLINE} Connect with drivers and passengers across Lahore.
             </p>
           </div>
 
@@ -60,10 +59,18 @@ export function Footer() {
 
         <Separator className="my-8 bg-neutral-800" />
 
-        <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
-          <p className="text-sm text-neutral-500">
-            &copy; {new Date().getFullYear()} RouteLink. All rights reserved.
-          </p>
+        <div className="flex flex-col items-center justify-between gap-6 sm:flex-row">
+          <div className="space-y-1 text-center sm:text-left">
+            <p className="text-sm text-neutral-500">
+              &copy; {new Date().getFullYear()} RouteLink. All rights reserved.
+            </p>
+            <p className="text-xs text-neutral-400 font-medium">
+              Developed by **Muhammad Hamza Asim**
+            </p>
+            <p className="text-[10px] text-neutral-500">
+              Final Year Project &middot; Department of Software Engineering
+            </p>
+          </div>
           <div className="flex gap-6 text-sm">
             <Link
               href={ROUTES.login}

@@ -141,7 +141,7 @@ export default function RidesPage() {
                       {ride.status.replace("_", " ")}
                     </Badge>
                     <span className="text-lg font-bold text-neutral-900">
-                      ${ride.pricePerSeat} <span className="text-xs font-normal text-neutral-500">/ seat</span>
+                      Rs. {ride.pricePerSeat} <span className="text-xs font-normal text-neutral-500">/ seat</span>
                     </span>
                   </div>
 

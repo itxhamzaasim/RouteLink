@@ -30,16 +30,17 @@ export function AuthLayout({
         <div className="relative flex h-full flex-col justify-between p-12">
           <Logo variant="light" />
           <div>
-            <blockquote className="text-2xl font-medium leading-relaxed text-white">
-              &ldquo;RouteLink changed how I commute. I save money every week
-              and meet great people along the way.&rdquo;
-            </blockquote>
-            <footer className="mt-6">
-              <p className="font-semibold text-white">Sarah Mitchell</p>
-              <p className="text-sm text-neutral-400">
-                Daily commuter, San Francisco
+            <div className="space-y-4">
+              <h2 className="text-2xl font-bold text-white tracking-tight">
+                RouteLink
+              </h2>
+              <p className="text-sm leading-relaxed text-neutral-300">
+                A secure campus and corporate ride-sharing platform designed for students and professionals in Lahore. Commute sustainably, share transport expenses, and travel safely.
               </p>
-            </footer>
+              <p className="text-xs text-neutral-400 font-medium pt-2">
+                Developed by Muhammad Hamza Asim as a Final Year Project for the Department of Software Engineering.
+              </p>
+            </div>
           </div>
           <p className="text-sm text-neutral-500">
             &copy; {new Date().getFullYear()} RouteLink

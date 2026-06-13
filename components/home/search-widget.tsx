@@ -52,7 +52,7 @@ export function SearchWidget() {
             <MapPin className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-brand-600" />
             <Input
               id="origin"
-              placeholder="City or address"
+              placeholder="e.g. DHA Lahore or Johar Town"
               value={params.origin}
               onChange={(e) =>
                 setParams((p) => ({ ...p, origin: e.target.value }))
@@ -70,7 +70,7 @@ export function SearchWidget() {
             <MapPin className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-neutral-400" />
             <Input
               id="destination"
-              placeholder="Destination"
+              placeholder="e.g. LUMS, Gulberg, or FAST Lahore"
               value={params.destination}
               onChange={(e) =>
                 setParams((p) => ({ ...p, destination: e.target.value }))
