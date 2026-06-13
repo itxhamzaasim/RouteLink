@@ -7,19 +7,7 @@ import { authService } from "@/services/auth.service";
 import { rideService } from "@/services/ride.service";
 import { bookingService } from "@/services/booking.service";
 import { notificationService } from "@/services/notification.service";
-import dynamic from "next/dynamic";
 
-const RealLahoreMap = dynamic(() => import("@/components/dashboard/real-lahore-map"), {
-  ssr: false,
-  loading: () => (
-    <div className="w-full h-[320px] sm:h-[400px] flex items-center justify-center bg-neutral-50 rounded-2xl border border-neutral-200">
-      <div className="flex flex-col items-center gap-2 text-neutral-400">
-        <Loader2 className="size-6 animate-spin text-neutral-400" />
-        <span className="text-xs">Loading Live Lahore Map...</span>
-      </div>
-    </div>
-  ),
-});
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
@@ -51,9 +39,11 @@ export default function DashboardPage() {
   const [bookingSuccess, setBookingSuccess] = useState("");
   const [isBooking, setIsBooking] = useState(false);
 
-  // Rider/commuter location states
-  const [startLocation, setStartLocation] = useState<{ address: string; city: string; lat: number; lng: number } | null>(null);
-  const [destLocation, setDestLocation] = useState<{ address: string; city: string; lat: number; lng: number } | null>(null);
+  // Rider/commuter location form states
+  const [originAddress, setOriginAddress] = useState("");
+  const [originCity, setOriginCity] = useState("Lahore");
+  const [destAddress, setDestAddress] = useState("");
+  const [destCity, setDestCity] = useState("Lahore");
   const [departureTime, setDepartureTime] = useState("");
   const [availableSeats, setAvailableSeats] = useState("4");
   const [pricePerSeat, setPricePerSeat] = useState("500");
@@ -145,8 +135,8 @@ export default function DashboardPage() {
   // Handle rider posting new ride
   const handlePostRide = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!startLocation || !destLocation) {
-      setError("Please select both a Start point and a Destination on the Lahore map.");
+    if (!originAddress.trim() || !originCity.trim() || !destAddress.trim() || !destCity.trim()) {
+      setError("Please provide both start and destination addresses and cities.");
       return;
     }
 
@@ -172,16 +162,12 @@ export default function DashboardPage() {
       const token = JSON.parse(rawAuth).accessToken;
       const payload = {
         origin: {
-          address: startLocation.address,
-          city: startLocation.city,
-          lat: startLocation.lat,
-          lng: startLocation.lng,
+          address: originAddress.trim(),
+          city: originCity.trim(),
         },
         destination: {
-          address: destLocation.address,
-          city: destLocation.city,
-          lat: destLocation.lat,
-          lng: destLocation.lng,
+          address: destAddress.trim(),
+          city: destCity.trim(),
         },
         departureTime: departureTime,
         availableSeats: Number(availableSeats),
@@ -195,8 +181,10 @@ export default function DashboardPage() {
 
       await rideService.createRide(payload, token);
       setRideSuccess("Ride posted successfully!");
-      setStartLocation(null);
-      setDestLocation(null);
+      setOriginAddress("");
+      setOriginCity("Lahore");
+      setDestAddress("");
+      setDestCity("Lahore");
       setDepartureTime("");
       await loadDashboardData();
     } catch (err: any) {
@@ -259,39 +247,9 @@ export default function DashboardPage() {
     }
   };
 
-  // Select start/destination locations on the map
-  const handleSelectLocation = (
-    type: "start" | "dest",
-    location: { address: string; city: string; lat: number; lng: number } | null
-  ) => {
-    if (type === "start") {
-      setStartLocation(location);
-    } else {
-      setDestLocation(location);
-    }
-    setError("");
-  };
-
-  // Handle passenger selecting a ride from map or list
+  // Handle passenger selecting a ride from list
   const handleSelectRide = (ride: Ride) => {
     setSelectedRide(ride);
-    if (ride.origin?.lat && ride.origin?.lng && ride.destination?.lat && ride.destination?.lng) {
-      setStartLocation({
-        address: ride.origin.address,
-        city: ride.origin.city,
-        lat: ride.origin.lat,
-        lng: ride.origin.lng,
-      });
-      setDestLocation({
-        address: ride.destination.address,
-        city: ride.destination.city,
-        lat: ride.destination.lat,
-        lng: ride.destination.lng,
-      });
-    } else {
-      setStartLocation(null);
-      setDestLocation(null);
-    }
   };
 
   // Mark notification read
@@ -396,22 +354,7 @@ export default function DashboardPage() {
           {user?.role === "driver" ? (
             /* DRIVER VIEW */
             <div className="space-y-6">
-              {/* Real Interactive Map for Route Posting */}
-              <div className="rounded-2xl border border-neutral-200 bg-white p-4 shadow-xs">
-                <h2 className="text-sm font-bold text-neutral-800 mb-1 flex items-center gap-2">
-                  <MapPin className="size-4 text-emerald-500" />
-                  Step 1: Select Your Route On The Lahore Map
-                </h2>
-                <p className="text-xs text-neutral-500 leading-normal mb-3">
-                  Click two locations on the map, or use search suggestions below to set your Start and Destination points.
-                </p>
-                <RealLahoreMap 
-                  startLocation={startLocation}
-                  destLocation={destLocation}
-                  onSelectLocation={handleSelectLocation}
-                  interactive={true}
-                />
-              </div>
+
 
               {/* Driver Posted Rides list */}
               <Card className="border-neutral-200 shadow-sm">
@@ -467,24 +410,7 @@ export default function DashboardPage() {
           ) : (
             /* PASSENGER VIEW */
             <div className="space-y-6">
-              {/* Interactive map for passenger */}
-              <div className="rounded-2xl border border-neutral-200 bg-white p-4 shadow-xs">
-                <h2 className="text-sm font-bold text-neutral-800 mb-1 flex items-center gap-2">
-                  <MapPin className="size-4 text-brand-500" />
-                  Interactive Commute Feed
-                </h2>
-                <p className="text-xs text-neutral-500 leading-normal mb-3">
-                  Click on any ride marker on the map to inspect driver schedules and view calculated driving routes.
-                </p>
-                <RealLahoreMap 
-                  startLocation={startLocation}
-                  destLocation={destLocation}
-                  onSelectLocation={handleSelectLocation}
-                  activeRides={activeRides}
-                  onSelectRide={handleSelectRide}
-                  interactive={true}
-                />
-              </div>
+
 
               {/* Ride Booking Detail Modal Overlay / Sidebar detail Card */}
               {selectedRide && (
@@ -501,8 +427,6 @@ export default function DashboardPage() {
                       size="sm" 
                       onClick={() => {
                         setSelectedRide(null);
-                        setStartLocation(null);
-                        setDestLocation(null);
                       }}
                       className="size-7 p-0 rounded-full hover:bg-neutral-200 text-neutral-500"
                     >
@@ -647,19 +571,51 @@ export default function DashboardPage() {
                 )}
 
                 <form onSubmit={handlePostRide} className="space-y-4">
-                  {/* Selected Locations readout */}
-                  <div className="rounded-xl border border-neutral-100 bg-neutral-50/50 p-3 text-xs space-y-2">
-                    <div className="flex flex-col gap-1">
-                      <span className="text-[10px] text-neutral-400 font-bold uppercase">Start Hub:</span>
-                      <span className={startLocation ? "text-emerald-600 font-bold break-words" : "text-neutral-400 italic"}>
-                        {startLocation ? startLocation.address : "Select on map or search"}
-                      </span>
+                  {/* Origin Address and City Input Fields */}
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-2">
+                      <Label htmlFor="originAddress" className="text-xs font-semibold text-neutral-700">Start Address</Label>
+                      <Input
+                        id="originAddress"
+                        placeholder="e.g. LUMS Campus"
+                        value={originAddress}
+                        onChange={(e) => setOriginAddress(e.target.value)}
+                        className="h-10 bg-white text-xs"
+                      />
                     </div>
-                    <div className="flex flex-col gap-1 border-t border-neutral-100 pt-2">
-                      <span className="text-[10px] text-neutral-400 font-bold uppercase">Destination Hub:</span>
-                      <span className={destLocation ? "text-red-600 font-bold break-words" : "text-neutral-400 italic"}>
-                        {destLocation ? destLocation.address : "Select on map or search"}
-                      </span>
+                    <div className="space-y-2">
+                      <Label htmlFor="originCity" className="text-xs font-semibold text-neutral-700">Start City</Label>
+                      <Input
+                        id="originCity"
+                        placeholder="Lahore"
+                        value={originCity}
+                        onChange={(e) => setOriginCity(e.target.value)}
+                        className="h-10 bg-white text-xs"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Destination Address and City Input Fields */}
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-2">
+                      <Label htmlFor="destAddress" className="text-xs font-semibold text-neutral-700">Dest Address</Label>
+                      <Input
+                        id="destAddress"
+                        placeholder="e.g. DHA Phase 5"
+                        value={destAddress}
+                        onChange={(e) => setDestAddress(e.target.value)}
+                        className="h-10 bg-white text-xs"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="destCity" className="text-xs font-semibold text-neutral-700">Dest City</Label>
+                      <Input
+                        id="destCity"
+                        placeholder="Lahore"
+                        value={destCity}
+                        onChange={(e) => setDestCity(e.target.value)}
+                        className="h-10 bg-white text-xs"
+                      />
                     </div>
                   </div>
 
