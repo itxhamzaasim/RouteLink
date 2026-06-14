@@ -84,9 +84,9 @@ export default function RidesPage() {
         if (activeTab === "offers") {
           const data = await rideService.getDriverRides(token);
           setRides(data);
-        } else if (activeTab === "incoming") {
-          const data = await bookingService.getDriverBookings(token);
-          setIncomingBookings(data);
+        } else if (activeTab === "accepted-requests") {
+          const data = await rideService.getRideRequests(token, true);
+          setRequests(data);
         }
       }
     } catch (err: any) {
@@ -360,14 +360,14 @@ export default function RidesPage() {
               My Offers
             </button>
             <button
-              onClick={() => setActiveTab("incoming")}
+              onClick={() => setActiveTab("accepted-requests")}
               className={`px-4 py-2 text-sm font-semibold border-b-2 transition-colors cursor-pointer ${
-                activeTab === "incoming"
+                activeTab === "accepted-requests"
                   ? "border-brand-600 text-brand-600"
                   : "border-transparent text-neutral-500 hover:text-neutral-900"
               }`}
             >
-              Incoming Ride Requests
+              Accepted Requests
             </button>
           </>
         )}
@@ -564,34 +564,37 @@ export default function RidesPage() {
             )
           )}
 
-          {/* INCOMING COMMUTE BOOKING REQUESTS (for drivers) */}
-          {activeTab === "incoming" && !isPassenger && (
-            incomingBookings.length === 0 ? (
+          {/* ACCEPTED PASSENGER REQUESTS (for drivers) */}
+          {activeTab === "accepted-requests" && !isPassenger && (
+            requests.length === 0 ? (
               <Card className="border-dashed border-neutral-300">
                 <CardContent className="flex flex-col items-center justify-center py-16 text-center">
-                  <p className="text-lg font-medium text-neutral-900">No incoming ride requests</p>
+                  <p className="text-lg font-medium text-neutral-900">No accepted passenger requests yet</p>
                   <p className="mt-2 max-w-sm text-sm text-neutral-500">
-                    Passengers will request seats on your active offered rides. They will show up here.
+                    Browse pending requests in Requested Rides and offer them a ride. They will show up here.
                   </p>
                 </CardContent>
               </Card>
             ) : (
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                {incomingBookings.map((booking) => {
-                  const sched = formatDateTime(booking.rideDetails.departureTime);
+                {requests.map((request) => {
+                  const sched = formatDateTime(request.departureTime);
                   return (
-                    <Card key={booking.id} className="border-neutral-200 shadow-sm relative overflow-hidden flex flex-col justify-between hover:shadow-md transition-shadow">
+                    <Card key={request.id} className="border-neutral-200 shadow-sm relative overflow-hidden flex flex-col justify-between hover:shadow-md transition-shadow">
                       <CardContent className="p-5 space-y-4">
-                        <div className="flex items-center justify-between">
+                        <div className="flex items-start justify-between">
                           <div className="space-y-0.5">
-                            <p className="font-semibold text-neutral-900 text-sm truncate max-w-[150px]">{booking.passengerName}</p>
-                            <span className="text-[10px] text-neutral-400 block">Commuter Request</span>
+                            <p className="font-semibold text-neutral-900 truncate max-w-[150px]">
+                              {request.passengerName}
+                            </p>
+                            <div className="flex items-center gap-1 text-xs text-amber-500 font-medium">
+                              <Star className="size-3.5 fill-amber-500" />
+                              <span>{request.passengerRating?.toFixed(1) || "5.0"}</span>
+                            </div>
                           </div>
                           <div className="text-right">
-                            <span className="text-lg font-bold text-neutral-900">
-                              Rs. {booking.totalPrice}
-                            </span>
-                            <span className="text-[10px] text-neutral-400 block">{booking.seatsBooked} seat(s)</span>
+                            <span className="text-lg font-bold text-neutral-900">Rs. {request.proposedPrice}</span>
+                            <span className="text-[10px] text-neutral-400 block">proposed fare</span>
                           </div>
                         </div>
 
@@ -602,7 +605,7 @@ export default function RidesPage() {
                             <MapPin className="size-4 mt-0.5 text-brand-600 shrink-0" />
                             <div>
                               <p className="text-xs text-neutral-400">From</p>
-                              <p className="text-sm font-semibold text-neutral-950 truncate max-w-[200px]">{booking.rideDetails.origin.address}</p>
+                              <p className="text-sm font-semibold text-neutral-950 truncate max-w-[200px]">{request.origin.address}</p>
                             </div>
                           </div>
                           <div className="h-4 border-l border-dashed border-neutral-300 ml-2"></div>
@@ -610,57 +613,40 @@ export default function RidesPage() {
                             <MapPin className="size-4 mt-0.5 text-neutral-400 shrink-0" />
                             <div>
                               <p className="text-xs text-neutral-400">To</p>
-                              <p className="text-sm font-semibold text-neutral-950 truncate max-w-[200px]">{booking.rideDetails.destination.address}</p>
+                              <p className="text-sm font-semibold text-neutral-950 truncate max-w-[200px]">{request.destination.address}</p>
                             </div>
                           </div>
                         </div>
 
                         <hr className="border-neutral-100" />
 
-                        <div className="flex items-center justify-between text-xs text-neutral-600">
-                          <div className="flex items-center gap-1.5">
-                            <Calendar className="size-3.5 text-neutral-400" />
-                            <span>Departure: {sched.date} at {sched.time}</span>
+                        <div className="grid grid-cols-2 gap-2 text-xs text-neutral-600">
+                          <div className="flex items-center gap-1.5 col-span-2">
+                            <Calendar className="size-3.5 text-neutral-400 shrink-0" />
+                            <span>Departure: <strong>{sched.date} at {sched.time}</strong></span>
                           </div>
-                          <Badge variant="outline" className={`capitalize ${BOOKING_STATUS_BADGES[booking.status] || ""}`}>
-                            {booking.status}
-                          </Badge>
+                          <div className="text-xs text-neutral-500 flex items-center">
+                            Seats Needed: <strong className="text-neutral-900 ml-1">{request.seatsNeeded}</strong>
+                          </div>
+                          <div className="text-right">
+                            <Badge
+                              variant="outline"
+                              className="bg-brand-50 text-brand-700 border-brand-200 capitalize"
+                            >
+                              {request.status}
+                            </Badge>
+                          </div>
                         </div>
 
-                        {/* Booking actions */}
                         <div className="pt-2">
-                          {booking.status === "pending" && (
-                            <div className="grid grid-cols-2 gap-2">
-                              <Button
-                                size="sm"
-                                onClick={() => handleAcceptBooking(booking.id)}
-                                className="bg-brand-600 hover:bg-brand-700 text-white w-full text-xs h-9 cursor-pointer flex gap-1 items-center justify-center"
-                              >
-                                <Check className="size-4" />
-                                Accept
-                              </Button>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => handleRejectBooking(booking.id)}
-                                className="border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 w-full text-xs h-9 cursor-pointer flex gap-1 items-center justify-center"
-                              >
-                                <X className="size-4" />
-                                Decline
-                              </Button>
-                            </div>
-                          )}
-
-                          {booking.status === "accepted" && (
-                            <Button
-                              size="sm"
-                              onClick={() => handleContactPassenger(booking)}
-                              className="bg-neutral-950 hover:bg-neutral-800 text-white w-full text-xs h-9 cursor-pointer flex gap-2 items-center justify-center"
-                            >
-                              <MessageSquare className="size-4" />
-                              Contact Passenger
-                            </Button>
-                          )}
+                          <Button
+                            size="sm"
+                            onClick={() => handleContactPassengerForRequest(request)}
+                            className="bg-neutral-950 hover:bg-neutral-800 text-white w-full text-xs h-9 cursor-pointer flex gap-2 items-center justify-center"
+                          >
+                            <MessageSquare className="size-4" />
+                            Contact Passenger
+                          </Button>
                         </div>
                       </CardContent>
                     </Card>

@@ -92,8 +92,9 @@ export const rideService = {
   },
 
   // Ride Request service integrations
-  async getRideRequests(token: string): Promise<RideRequest[]> {
-    return apiClient<RideRequest[]>("/rides/requests", {
+  async getRideRequests(token: string, acceptedByMe?: boolean): Promise<RideRequest[]> {
+    const url = acceptedByMe ? "/rides/requests?acceptedByMe=true" : "/rides/requests";
+    return apiClient<RideRequest[]>(url, {
       method: "GET",
       token,
     });

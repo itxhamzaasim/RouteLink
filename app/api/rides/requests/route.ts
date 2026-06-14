@@ -20,8 +20,18 @@ export async function GET(req: Request) {
       const requests = await RideRequest.find({ passengerId: user._id }).sort({ departureTime: 1 });
       return NextResponse.json(requests, { status: 200 });
     } else {
-      // Drivers/Admins get all pending requests from passengers
-      const requests = await RideRequest.find({ status: "pending" }).sort({ departureTime: 1 });
+      // Drivers/Admins get all pending requests from passengers, or requests accepted by them
+      const { searchParams } = new URL(req.url);
+      const acceptedByMe = searchParams.get("acceptedByMe") === "true";
+
+      let query: any = {};
+      if (acceptedByMe) {
+        query = { driverId: user._id };
+      } else {
+        query = { status: "pending" };
+      }
+
+      const requests = await RideRequest.find(query).sort({ departureTime: 1 });
       return NextResponse.json(requests, { status: 200 });
     }
   } catch (error: any) {
