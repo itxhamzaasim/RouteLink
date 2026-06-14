@@ -40,12 +40,20 @@ export default function DashboardPage() {
   const [isBooking, setIsBooking] = useState(false);
 
   // Rider/commuter location form states
+  const getCurrentTimeStr = () => {
+    const now = new Date();
+    const hours = String(now.getHours()).padStart(2, "0");
+    const minutes = String(now.getMinutes()).padStart(2, "0");
+    return `${hours}:${minutes}`;
+  };
+
   const [originAddress, setOriginAddress] = useState("");
   const [originCity, setOriginCity] = useState("Lahore");
   const [destAddress, setDestAddress] = useState("");
   const [destCity, setDestCity] = useState("Lahore");
   const [availableSeats, setAvailableSeats] = useState("4");
   const [pricePerSeat, setPricePerSeat] = useState("500");
+  const [rideTime, setRideTime] = useState(getCurrentTimeStr());
   const [vehicleMake, setVehicleMake] = useState("");
   const [vehicleModel, setVehicleModel] = useState("Standard");
   const [vehiclePlate, setVehiclePlate] = useState("");
@@ -164,6 +172,12 @@ export default function DashboardPage() {
 
     try {
       const token = JSON.parse(rawAuth).accessToken;
+      
+      const today = new Date();
+      const [hours, minutes] = rideTime.split(":").map(Number);
+      today.setHours(hours, minutes, 0, 0);
+      const departureTime = today.toISOString();
+
       const payload = {
         origin: {
           address: originAddress.trim(),
@@ -173,7 +187,7 @@ export default function DashboardPage() {
           address: destAddress.trim(),
           city: destCity.trim(),
         },
-        departureTime: new Date().toISOString(),
+        departureTime,
         availableSeats: Number(availableSeats),
         pricePerSeat: Number(pricePerSeat),
         vehicleDetails: {
@@ -671,6 +685,18 @@ export default function DashboardPage() {
                   </div>
 
 
+
+                  <div className="space-y-2">
+                    <Label htmlFor="rideTime" className="text-xs font-semibold text-neutral-700">Departure Time</Label>
+                    <Input
+                      id="rideTime"
+                      type="time"
+                      value={rideTime}
+                      onChange={(e) => setRideTime(e.target.value)}
+                      className="h-10 bg-white text-xs"
+                      required
+                    />
+                  </div>
 
                   <div className="grid grid-cols-2 gap-3">
                     <div className="space-y-2">

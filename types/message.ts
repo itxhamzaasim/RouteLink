@@ -10,4 +10,5 @@ export interface ChatPartner {
   id: string;
   name: string;
   role: string;
+  unreadCount?: number;
 }

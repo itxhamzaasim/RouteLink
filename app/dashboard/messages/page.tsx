@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef, Suspense } from "react";
+import { useEffect, useState, useRef, Suspense, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
 import { Send, Loader2, MessageSquare, Car, User, Search, Shield } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
@@ -30,57 +30,75 @@ function MessagesContent() {
   const chatEndRef = useRef<HTMLDivElement>(null);
   const autoMessageSentRef = useRef(false);
 
-  // Fetch partners on load
-  useEffect(() => {
-    const fetchPartners = async () => {
-      if (typeof window === "undefined" || !user) return;
-      const rawAuth = localStorage.getItem("routelink-auth");
-      if (!rawAuth) return;
+  // Callback to fetch chat partners
+  const fetchPartners = useCallback(async (isSilent = false) => {
+    if (typeof window === "undefined" || !user) return;
+    const rawAuth = localStorage.getItem("routelink-auth");
+    if (!rawAuth) return;
 
-      try {
-        const token = JSON.parse(rawAuth).accessToken;
-        let data = await messageService.getChatPartners(token);
-        
-        if (paramUserId && paramName && paramRole) {
-          const exists = data.some((p) => p.id === paramUserId);
-          const targetPartner = {
-            id: paramUserId,
-            name: paramName,
-            role: paramRole,
-          };
-          if (!exists) {
-            data = [targetPartner, ...data];
-          }
-          setPartners(data);
-
-          if (paramAutoMessage && !autoMessageSentRef.current) {
-            autoMessageSentRef.current = true;
-            try {
-              // Send the autoMessage immediately
-              await messageService.sendDirectMessage(
-                paramUserId,
-                paramAutoMessage,
-                token
-              );
-            } catch (err) {
-              console.error("Failed to send auto message:", err);
-            }
-            // Clear search params from URL without reloading
-            window.history.replaceState(null, "", window.location.pathname);
-          }
-          
-          setSelectedPartner(targetPartner);
-        } else {
-          setPartners(data);
+    if (!isSilent) setIsPartnersLoading(true);
+    try {
+      const token = JSON.parse(rawAuth).accessToken;
+      let data = await messageService.getChatPartners(token);
+      
+      if (paramUserId && paramName && paramRole && !isSilent) {
+        const exists = data.some((p) => p.id === paramUserId);
+        const targetPartner = {
+          id: paramUserId,
+          name: paramName,
+          role: paramRole,
+        };
+        if (!exists) {
+          data = [targetPartner, ...data];
         }
-      } catch (err) {
-        console.error("Failed to load chat partners:", err);
-      } finally {
-        setIsPartnersLoading(false);
+        setPartners(data);
+
+        if (paramAutoMessage && !autoMessageSentRef.current) {
+          autoMessageSentRef.current = true;
+          try {
+            await messageService.sendDirectMessage(
+              paramUserId,
+              paramAutoMessage,
+              token
+            );
+          } catch (err) {
+            console.error("Failed to send auto message:", err);
+          }
+          window.history.replaceState(null, "", window.location.pathname);
+        }
+        
+        setSelectedPartner(targetPartner);
+      } else {
+        // Update partners list and keep selected partner reset locally
+        setPartners((prev) => {
+          return data.map((newP) => {
+            if (selectedPartner && newP.id === selectedPartner.id) {
+              return { ...newP, unreadCount: 0 };
+            }
+            return newP;
+          });
+        });
       }
-    };
-    fetchPartners();
-  }, [user, paramUserId, paramName, paramRole, paramAutoMessage]);
+    } catch (err) {
+      console.error("Failed to load chat partners:", err);
+    } finally {
+      if (!isSilent) setIsPartnersLoading(false);
+    }
+  }, [user, paramUserId, paramName, paramRole, paramAutoMessage, selectedPartner]);
+
+  // Initial load
+  useEffect(() => {
+    fetchPartners(false);
+  }, [user]);
+
+  // Polling for partner list updates to catch new messages/counts
+  useEffect(() => {
+    if (!user) return;
+    const interval = setInterval(() => {
+      fetchPartners(true);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [user, fetchPartners]);
 
   // Fetch messages when selectedPartner changes
   const fetchMessages = async (showLoading = false) => {
@@ -103,6 +121,10 @@ function MessagesContent() {
   useEffect(() => {
     if (selectedPartner) {
       fetchMessages(true);
+      // Mark read locally instantly
+      setPartners((prev) =>
+        prev.map((p) => (p.id === selectedPartner.id ? { ...p, unreadCount: 0 } : p))
+      );
     } else {
       setMessages([]);
     }
@@ -239,9 +261,14 @@ function MessagesContent() {
                     {getPartnerInitials(partner.name)}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-semibold text-neutral-900 truncate text-sm">
-                      {partner.name}
-                    </p>
+                    <div className="flex items-center justify-between">
+                      <p className="font-semibold text-neutral-900 truncate text-sm">
+                        {partner.name}
+                      </p>
+                      {partner.unreadCount && partner.unreadCount > 0 && !isSelected && (
+                        <span className="size-2.5 rounded-full bg-emerald-500 shrink-0 ml-2 animate-pulse" />
+                      )}
+                    </div>
                     <div className="mt-0.5 flex items-center gap-1.5">
                       <span
                         className={`inline-flex items-center rounded-full border px-1.5 py-0.2 text-[9px] font-medium ${badge.classes}`}

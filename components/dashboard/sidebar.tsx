@@ -23,6 +23,7 @@ import { DASHBOARD_NAV } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import { useAuthContext } from "@/components/providers/auth-provider";
 import { messageService } from "@/services/message.service";
+import { notificationService } from "@/services/notification.service";
 
 const ICON_MAP = {
   LayoutDashboard,
@@ -46,6 +47,7 @@ export function DashboardSidebar() {
 
   const [unreadDMs, setUnreadDMs] = useState(0);
   const [unreadCommunity, setUnreadCommunity] = useState(0);
+  const [unreadNotifications, setUnreadNotifications] = useState(0);
 
   const fetchUnreadCounts = useCallback(async () => {
     if (typeof window === "undefined" || !user) return;
@@ -55,9 +57,13 @@ export function DashboardSidebar() {
     try {
       const token = JSON.parse(rawAuth).accessToken;
       const lastCommunitySeen = localStorage.getItem("routelink-last-community-visit");
-      const data = await messageService.getUnreadCounts(lastCommunitySeen, token);
+      const [data, notifs] = await Promise.all([
+        messageService.getUnreadCounts(lastCommunitySeen, token),
+        notificationService.getNotifications(token),
+      ]);
       setUnreadDMs(data.unreadDMsCount);
       setUnreadCommunity(data.unreadCommunityCount);
+      setUnreadNotifications(notifs.filter((n) => !n.isRead).length);
     } catch (err) {
       console.error("Failed to fetch unread counts in sidebar:", err);
     }
@@ -109,7 +115,8 @@ export function DashboardSidebar() {
 
           const hasDot = 
             (item.label === "Messages" && unreadDMs > 0) ||
-            (item.label === "Community" && unreadCommunity > 0);
+            (item.label === "Community" && unreadCommunity > 0) ||
+            (item.label === "Activity Feed" && unreadNotifications > 0);
 
           return (
             <Link
@@ -127,7 +134,7 @@ export function DashboardSidebar() {
                 {item.label}
               </div>
               {hasDot && (
-                <Star className="size-4 text-emerald-500 fill-emerald-500 animate-pulse mr-1" />
+                <span className="size-2 rounded-full bg-emerald-500 animate-pulse mr-1.5 shrink-0" />
               )}
             </Link>
           );

@@ -4,6 +4,7 @@ import { Booking } from "@/lib/models/Booking";
 import { Ride } from "@/lib/models/Ride";
 import { RideRequest } from "@/lib/models/RideRequest";
 import { User } from "@/lib/models/User";
+import { DirectMessage } from "@/lib/models/DirectMessage";
 import { requireAuth, isNextResponse } from "@/lib/auth-api";
 
 export async function GET(req: Request) {
@@ -16,8 +17,16 @@ export async function GET(req: Request) {
 
     await connectDB();
 
-    const partners = new Map<string, { id: string; name: string; role: string }>();
+    const partners = new Map<string, { id: string; name: string; role: string; unreadCount?: number }>();
     const userId = user._id.toString();
+
+    // Fetch unread messages to count them per partner
+    const unreadMessages = await DirectMessage.find({ recipientId: userId, isRead: false });
+    const unreadCounts = new Map<string, number>();
+    for (const msg of unreadMessages) {
+      const sender = msg.senderId.toString();
+      unreadCounts.set(sender, (unreadCounts.get(sender) || 0) + 1);
+    }
 
     if (user.role === "passenger") {
       // 1. Fetch accepted bookings where logged-in user is passenger
@@ -29,6 +38,7 @@ export async function GET(req: Request) {
             id: ride.driverId.toString(),
             name: ride.driverName || "Driver",
             role: "driver",
+            unreadCount: unreadCounts.get(ride.driverId.toString()) || 0,
           });
         }
       }
@@ -43,6 +53,7 @@ export async function GET(req: Request) {
               id: reqObj.driverId.toString(),
               name: `${driverUser.firstName} ${driverUser.lastName}`,
               role: "driver",
+              unreadCount: unreadCounts.get(reqObj.driverId.toString()) || 0,
             });
           }
         }
@@ -60,6 +71,7 @@ export async function GET(req: Request) {
             id: booking.passengerId.toString(),
             name: booking.passengerName || "Passenger",
             role: "passenger",
+            unreadCount: unreadCounts.get(booking.passengerId.toString()) || 0,
           });
         }
       }
@@ -73,6 +85,7 @@ export async function GET(req: Request) {
             id: reqObj.passengerId.toString(),
             name: `${passengerUser.firstName} ${passengerUser.lastName}`,
             role: "passenger",
+            unreadCount: unreadCounts.get(reqObj.passengerId.toString()) || 0,
           });
         }
       }
@@ -85,6 +98,7 @@ export async function GET(req: Request) {
           id: u._id.toString(),
           name: `${u.firstName} ${u.lastName}`,
           role: u.role,
+          unreadCount: unreadCounts.get(u._id.toString()) || 0,
         });
       }
     }
