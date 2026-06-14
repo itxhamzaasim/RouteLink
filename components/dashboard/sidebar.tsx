@@ -24,6 +24,7 @@ import { cn } from "@/lib/utils";
 import { useAuthContext } from "@/components/providers/auth-provider";
 import { messageService } from "@/services/message.service";
 import { notificationService } from "@/services/notification.service";
+import { bookingService } from "@/services/booking.service";
 
 const ICON_MAP = {
   LayoutDashboard,
@@ -48,6 +49,7 @@ export function DashboardSidebar() {
   const [unreadDMs, setUnreadDMs] = useState(0);
   const [unreadCommunity, setUnreadCommunity] = useState(0);
   const [unreadNotifications, setUnreadNotifications] = useState(0);
+  const [unreadOffers, setUnreadOffers] = useState(0);
 
   const fetchUnreadCounts = useCallback(async () => {
     if (typeof window === "undefined" || !user) return;
@@ -57,13 +59,29 @@ export function DashboardSidebar() {
     try {
       const token = JSON.parse(rawAuth).accessToken;
       const lastCommunitySeen = localStorage.getItem("routelink-last-community-visit");
-      const [data, notifs] = await Promise.all([
+      
+      const promises: Promise<any>[] = [
         messageService.getUnreadCounts(lastCommunitySeen, token),
         notificationService.getNotifications(token),
-      ]);
+      ];
+      if (user.role === "driver") {
+        promises.push(bookingService.getDriverBookings(token));
+      }
+
+      const results = await Promise.all(promises);
+      const data = results[0];
+      const notifs = results[1];
+
       setUnreadDMs(data.unreadDMsCount);
       setUnreadCommunity(data.unreadCommunityCount);
-      setUnreadNotifications(notifs.filter((n) => !n.isRead).length);
+      setUnreadNotifications(notifs.filter((n: any) => !n.isRead).length);
+
+      if (user.role === "driver" && results[2]) {
+        const pendingCount = results[2].filter((b: any) => b.status === "pending").length;
+        setUnreadOffers(pendingCount);
+      } else {
+        setUnreadOffers(0);
+      }
     } catch (err) {
       console.error("Failed to fetch unread counts in sidebar:", err);
     }
@@ -75,23 +93,33 @@ export function DashboardSidebar() {
     return () => clearInterval(interval);
   }, [fetchUnreadCounts]);
 
-  const navItems: Array<{ label: string; href: string; icon: string }> = DASHBOARD_NAV.map((item) => {
+  const navItems: Array<{ label: string; href: string; icon: string }> = [];
+  DASHBOARD_NAV.forEach((item) => {
+    let label: string = item.label;
+    let href: string = item.href;
+
     if (item.href === "/dashboard/rides" && user?.role === "passenger") {
-      return { label: "My Commute Bookings", href: item.href, icon: item.icon };
+      label = "My Commute Bookings";
     }
     if (item.href === "/dashboard/search") {
       if (user?.role === "passenger") {
-        return { label: "Available Rides", href: item.href, icon: item.icon };
+        label = "Available Rides";
       } else {
-        return { label: "Requested Rides", href: "/dashboard/requested-rides", icon: item.icon };
+        label = "Requested Rides";
+        href = "/dashboard/requested-rides";
       }
     }
-    return {
-      label: item.label,
-      href: item.href,
-      icon: item.icon,
-    };
+    navItems.push({ label, href, icon: item.icon });
+
+    if (item.label === "Activity Feed" && user?.role === "driver") {
+      navItems.push({
+        label: "Requested Offers",
+        href: "/dashboard/requested-offers",
+        icon: "Ticket",
+      });
+    }
   });
+
   if (user?.role === "admin") {
     navItems.push({
       label: "Admin Panel",
@@ -116,7 +144,8 @@ export function DashboardSidebar() {
           const hasDot = 
             (item.label === "Messages" && unreadDMs > 0) ||
             (item.label === "Community" && unreadCommunity > 0) ||
-            (item.label === "Activity Feed" && unreadNotifications > 0);
+            (item.label === "Activity Feed" && unreadNotifications > 0) ||
+            (item.label === "Requested Offers" && unreadOffers > 0);
 
           return (
             <Link
