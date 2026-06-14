@@ -11,6 +11,7 @@ import type { User } from "@/types";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Card, CardContent } from "@/components/ui/card";
 
 export default function AdminUsersPage() {
   const { user: currentUser } = useAuthContext();
@@ -81,14 +82,11 @@ export default function AdminUsersPage() {
     }
   };
 
-  // Legacy cycle role functionality
+  // Cycle role functionality (toggles between passenger and driver)
   const handleRoleChange = async (userId: string, currentRole: string, isVerified: boolean) => {
     if (typeof window === "undefined") return;
     
-    let nextRole: "passenger" | "driver" | "admin" = "passenger";
-    if (currentRole === "passenger") nextRole = "driver";
-    else if (currentRole === "driver") nextRole = "admin";
-    else if (currentRole === "admin") nextRole = "passenger";
+    const nextRole = currentRole === "passenger" ? "driver" : "passenger";
 
     if (userId === currentUser?.id) {
       alert("You cannot modify your own administrative role state.");
@@ -146,13 +144,17 @@ export default function AdminUsersPage() {
     }
   };
 
+  // Extract administrators and non-administrators
+  const admins = users.filter((u) => u.role === "admin");
+  const nonAdmins = users.filter((u) => u.role !== "admin");
+
   // Extract pending driver verification applications
-  const pendingDrivers = users.filter(
+  const pendingDrivers = nonAdmins.filter(
     (u) => u.driverApplicationStatus === "pending"
   );
 
   // Filter & Search logic for standard user list
-  const filteredUsers = users.filter((u) => {
+  const filteredUsers = nonAdmins.filter((u) => {
     const matchesSearch =
       `${u.firstName} ${u.lastName}`.toLowerCase().includes(searchQuery.toLowerCase()) ||
       u.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -190,6 +192,35 @@ export default function AdminUsersPage() {
           Verify driver applications, toggle suspension rules, ban malicious accounts, or adjust roles.
         </p>
       </div>
+
+      {/* ADMINISTRATORS SUMMARY CARD */}
+      <Card className="border-neutral-800 bg-neutral-900 p-5 rounded-2xl shadow-sm">
+        <h3 className="text-sm font-extrabold text-brand-400 flex items-center gap-2 mb-2">
+          <Shield className="size-4 text-brand-500" />
+          System Administrators
+        </h3>
+        {admins.length === 0 ? (
+          <p className="text-xs text-neutral-500">No admins found.</p>
+        ) : (
+          <div className="flex flex-wrap gap-4 mt-2">
+            {admins.map((adm) => (
+              <div key={adm.id} className="flex items-center gap-2.5 bg-neutral-950/50 px-3 py-2 rounded-xl border border-neutral-800/60">
+                <div className="size-7 rounded-full bg-neutral-800 flex items-center justify-center overflow-hidden border border-neutral-700">
+                  {adm.avatarUrl ? (
+                    <img src={adm.avatarUrl} alt="Avatar" className="size-full object-cover" />
+                  ) : (
+                    <ShieldCheck className="size-4 text-brand-400" />
+                  )}
+                </div>
+                <div>
+                  <div className="text-xs font-bold text-neutral-200">{adm.firstName} {adm.lastName}</div>
+                  <div className="text-[10px] text-neutral-500">{adm.email}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </Card>
 
       {/* PENDING DRIVER VERIFICATION SECTION */}
       {pendingDrivers.length > 0 && (
@@ -294,7 +325,7 @@ export default function AdminUsersPage() {
         </div>
 
         <div className="flex gap-2 w-full sm:w-auto shrink-0 justify-end overflow-x-auto">
-          {["all", "passenger", "driver", "admin"].map((role) => (
+          {["all", "passenger", "driver"].map((role) => (
             <button
               key={role}
               onClick={() => setRoleFilter(role)}
@@ -304,7 +335,7 @@ export default function AdminUsersPage() {
                   : "bg-neutral-950 border-neutral-800 text-neutral-400 hover:text-white"
               }`}
             >
-              {role === "all" ? "All Roles" : role}
+              {role === "all" ? "All Users" : role === "driver" ? "Drivers Too" : "Passengers Only"}
             </button>
           ))}
         </div>
@@ -358,20 +389,23 @@ export default function AdminUsersPage() {
                     </td>
                     <td className="px-6 py-4 text-xs font-mono">{u.phone || "—"}</td>
                     <td className="px-6 py-4">
-                      <button
-                        onClick={() => handleRoleChange(u.id, u.role, u.isVerified)}
-                        className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-semibold uppercase tracking-wider border transition-all cursor-pointer ${
-                          u.role === "admin"
-                            ? "bg-brand-500/10 text-brand-400 border-brand-500/25 hover:bg-brand-500/20"
-                            : u.role === "driver"
-                            ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/25 hover:bg-emerald-500/20"
-                            : "bg-neutral-950 text-neutral-400 border-neutral-800 hover:bg-neutral-800"
-                        }`}
-                        title="Click to cycle role (Cycle)"
-                      >
-                        <Shield className="size-3" />
-                        {u.role}
-                      </button>
+                      <div className="flex flex-wrap items-center gap-1.5">
+                        <Badge variant="outline" className="bg-neutral-950 text-neutral-400 border-neutral-800 text-[10px] font-bold">
+                          Passenger
+                        </Badge>
+                        {u.role === "driver" && (
+                          <Badge variant="outline" className="bg-emerald-500/10 text-emerald-400 border-emerald-500/20 text-[10px] font-bold">
+                            Driver
+                          </Badge>
+                        )}
+                        <button
+                          onClick={() => handleRoleChange(u.id, u.role, u.isVerified)}
+                          className="text-[10px] text-brand-400 hover:text-brand-300 font-bold block hover:underline ml-1 cursor-pointer"
+                          title="Click to toggle Driver status"
+                        >
+                          Toggle Driver
+                        </button>
+                      </div>
                     </td>
                     <td className="px-6 py-4">
                       <button
