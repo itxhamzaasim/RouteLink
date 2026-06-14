@@ -51,8 +51,8 @@ export default function DashboardPage() {
   const [originCity, setOriginCity] = useState("Lahore");
   const [destAddress, setDestAddress] = useState("");
   const [destCity, setDestCity] = useState("Lahore");
-  const [availableSeats, setAvailableSeats] = useState("4");
-  const [pricePerSeat, setPricePerSeat] = useState("500");
+  const [availableSeats, setAvailableSeats] = useState("1");
+  const [pricePerSeat, setPricePerSeat] = useState("100");
   const [rideTime, setRideTime] = useState(getCurrentTimeStr());
   const [vehicleMake, setVehicleMake] = useState("");
   const [vehicleModel, setVehicleModel] = useState("Standard");
@@ -67,7 +67,7 @@ export default function DashboardPage() {
   const [reqDestAddress, setReqDestAddress] = useState("");
   const [reqDestCity, setReqDestCity] = useState("Lahore");
   const [seatsNeeded, setSeatsNeeded] = useState("1");
-  const [proposedPrice, setProposedPrice] = useState("500");
+  const [proposedPrice, setProposedPrice] = useState("100");
   const [isRequesting, setIsRequesting] = useState(false);
   const [requestSuccess, setRequestSuccess] = useState("");
 
@@ -250,7 +250,7 @@ export default function DashboardPage() {
       setReqDestAddress("");
       setReqDestCity("Lahore");
       setSeatsNeeded("1");
-      setProposedPrice("500");
+      setProposedPrice("100");
       await loadDashboardData();
     } catch (err: any) {
       setError(err.message || "Failed to post request.");
