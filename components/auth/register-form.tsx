@@ -10,6 +10,47 @@ import { validateRegister } from "@/lib/validations/auth";
 import type { RegisterCredentials } from "@/types";
 import { cn } from "@/lib/utils";
 
+const compressImage = (file: File, maxW: number = 500, maxH: number = 500): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = (event) => {
+      const img = new Image();
+      img.src = event.target?.result as string;
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        let width = img.width;
+        let height = img.height;
+
+        if (width > height) {
+          if (width > maxW) {
+            height = Math.round((height * maxW) / width);
+            width = maxW;
+          }
+        } else {
+          if (height > maxH) {
+            width = Math.round((width * maxH) / height);
+            height = maxH;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d");
+        if (!ctx) {
+          resolve(event.target?.result as string);
+          return;
+        }
+        ctx.drawImage(img, 0, 0, width, height);
+        const dataUrl = canvas.toDataURL("image/jpeg", 0.7);
+        resolve(dataUrl);
+      };
+      img.onerror = (err) => reject(err);
+    };
+    reader.onerror = (err) => reject(err);
+  });
+};
+
 export function RegisterForm() {
   const { register } = useAuthContext();
   const [showPassword, setShowPassword] = useState(false);
@@ -178,14 +219,52 @@ export function RegisterForm() {
           <h3 className="font-semibold text-neutral-800 text-sm">Driver Profile & Vehicle Details</h3>
           
           <div className="space-y-2">
-            <Label htmlFor="avatarUrl">Profile Photo URL</Label>
-            <Input
-              id="avatarUrl"
-              placeholder="https://example.com/avatar.jpg"
-              value={credentials.avatarUrl || ""}
-              onChange={(e) => handleChange("avatarUrl", e.target.value)}
-              className="h-11 bg-white"
-            />
+            <Label htmlFor="avatarFile">Profile Photo</Label>
+            <div className="flex items-center gap-3">
+              {credentials.avatarUrl ? (
+                <div className="relative size-12 shrink-0 overflow-hidden rounded-xl border border-neutral-200">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={credentials.avatarUrl}
+                    alt="Profile preview"
+                    className="size-full object-cover"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => handleChange("avatarUrl", "")}
+                    className="absolute -right-1 -top-1 rounded-full bg-red-500 p-0.5 text-white hover:bg-red-600 shadow-xs scale-75"
+                  >
+                    <span className="sr-only">Remove</span>
+                    <svg className="size-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+              ) : (
+                <div className="size-12 shrink-0 rounded-xl border-2 border-dashed border-neutral-300 bg-neutral-100 flex items-center justify-center text-neutral-400">
+                  <svg className="size-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                  </svg>
+                </div>
+              )}
+              <Input
+                id="avatarFile"
+                type="file"
+                accept="image/*"
+                onChange={async (e) => {
+                  const file = e.target.files?.[0];
+                  if (file) {
+                    try {
+                      const compressed = await compressImage(file, 300, 300);
+                      handleChange("avatarUrl", compressed);
+                    } catch (err) {
+                      console.error("Failed to compress avatar image:", err);
+                    }
+                  }
+                }}
+                className="h-11 bg-white text-xs pt-2.5"
+              />
+            </div>
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2">
@@ -220,25 +299,101 @@ export function RegisterForm() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="vehiclePhotoUrl">Vehicle Photo URL</Label>
-            <Input
-              id="vehiclePhotoUrl"
-              placeholder="https://example.com/car.jpg"
-              value={vehiclePhotoUrl}
-              onChange={(e) => setVehiclePhotoUrl(e.target.value)}
-              className="h-11 bg-white"
-            />
+            <Label htmlFor="vehiclePhotoFile">Vehicle Photo</Label>
+            <div className="flex items-center gap-3">
+              {vehiclePhotoUrl ? (
+                <div className="relative size-12 shrink-0 overflow-hidden rounded-xl border border-neutral-200">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={vehiclePhotoUrl}
+                    alt="Vehicle preview"
+                    className="size-full object-cover"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setVehiclePhotoUrl("")}
+                    className="absolute -right-1 -top-1 rounded-full bg-red-500 p-0.5 text-white hover:bg-red-600 shadow-xs scale-75"
+                  >
+                    <span className="sr-only">Remove</span>
+                    <svg className="size-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+              ) : (
+                <div className="size-12 shrink-0 rounded-xl border-2 border-dashed border-neutral-300 bg-neutral-100 flex items-center justify-center text-neutral-400">
+                  <svg className="size-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                  </svg>
+                </div>
+              )}
+              <Input
+                id="vehiclePhotoFile"
+                type="file"
+                accept="image/*"
+                onChange={async (e) => {
+                  const file = e.target.files?.[0];
+                  if (file) {
+                    try {
+                      const compressed = await compressImage(file, 500, 500);
+                      setVehiclePhotoUrl(compressed);
+                    } catch (err) {
+                      console.error("Failed to compress vehicle image:", err);
+                    }
+                  }
+                }}
+                className="h-11 bg-white text-xs pt-2.5"
+              />
+            </div>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="drivingLicense">Driving License URL (Optional)</Label>
-            <Input
-              id="drivingLicense"
-              placeholder="https://example.com/license.jpg"
-              value={credentials.drivingLicense || ""}
-              onChange={(e) => handleChange("drivingLicense", e.target.value)}
-              className="h-11 bg-white"
-            />
+            <Label htmlFor="drivingLicenseFile">Driving License (Optional)</Label>
+            <div className="flex items-center gap-3">
+              {credentials.drivingLicense ? (
+                <div className="relative size-12 shrink-0 overflow-hidden rounded-xl border border-neutral-200">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={credentials.drivingLicense}
+                    alt="License preview"
+                    className="size-full object-cover"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => handleChange("drivingLicense", "")}
+                    className="absolute -right-1 -top-1 rounded-full bg-red-500 p-0.5 text-white hover:bg-red-600 shadow-xs scale-75"
+                  >
+                    <span className="sr-only">Remove</span>
+                    <svg className="size-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+              ) : (
+                <div className="size-12 shrink-0 rounded-xl border-2 border-dashed border-neutral-300 bg-neutral-100 flex items-center justify-center text-neutral-400">
+                  <svg className="size-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                  </svg>
+                </div>
+              )}
+              <Input
+                id="drivingLicenseFile"
+                type="file"
+                accept="image/*"
+                onChange={async (e) => {
+                  const file = e.target.files?.[0];
+                  if (file) {
+                    try {
+                      const compressed = await compressImage(file, 500, 500);
+                      handleChange("drivingLicense", compressed);
+                    } catch (err) {
+                      console.error("Failed to compress license image:", err);
+                    }
+                  }
+                }}
+                className="h-11 bg-white text-xs pt-2.5"
+              />
+            </div>
           </div>
         </div>
       )}
