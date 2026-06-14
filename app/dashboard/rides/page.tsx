@@ -259,6 +259,16 @@ export default function RidesPage() {
     );
   };
 
+  const handleContactDriver = (booking: Booking) => {
+    if (!booking.rideDetails.driverId) return;
+    const autoMsg = "Hi, I have a confirmed booking on your ride!";
+    router.push(
+      `/dashboard/messages?userId=${booking.rideDetails.driverId}&name=${encodeURIComponent(
+        booking.rideDetails.driverName
+      )}&role=driver&autoMessage=${encodeURIComponent(autoMsg)}`
+    );
+  };
+
   const formatDateTime = (isoString: string) => {
     const d = new Date(isoString);
     return {
@@ -556,6 +566,19 @@ export default function RidesPage() {
                             </Button>
                           )}
                         </div>
+
+                        {booking.status === "accepted" && (
+                          <div className="pt-2">
+                            <Button
+                              size="sm"
+                              onClick={() => handleContactDriver(booking)}
+                              className="bg-neutral-950 hover:bg-neutral-800 text-white w-full text-xs h-9 cursor-pointer flex gap-2 items-center justify-center"
+                            >
+                              <MessageSquare className="size-4" />
+                              Contact Driver
+                            </Button>
+                          </div>
+                        )}
                       </CardContent>
                     </Card>
                   );

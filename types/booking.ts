@@ -9,6 +9,7 @@ export interface BookingRideDetails {
   };
   departureTime: string;
   driverName: string;
+  driverId?: string;
 }
 
 export interface Booking {

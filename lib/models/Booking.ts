@@ -66,6 +66,7 @@ const BookingSchema = new Schema<IBooking>(
       },
       departureTime: { type: Date, required: true },
       driverName: { type: String, required: true },
+      driverId: { type: Schema.Types.ObjectId, ref: "User", required: true },
     },
   },
   {

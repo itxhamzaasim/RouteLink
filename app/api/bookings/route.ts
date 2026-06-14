@@ -17,7 +17,20 @@ export async function GET(req: Request) {
     await connectDB();
 
     const bookings = await Booking.find({ passengerId: user._id }).sort({ createdAt: -1 });
-    return NextResponse.json(bookings, { status: 200 });
+
+    const bookingsWithDriverId = await Promise.all(
+      bookings.map(async (b) => {
+        const obj = b.toJSON();
+        if (!obj.rideDetails.driverId) {
+          const ride = await Ride.findById(b.rideId);
+          if (ride) {
+            obj.rideDetails.driverId = ride.driverId.toString();
+          }
+        }
+        return obj;
+      })
+    );
+    return NextResponse.json(bookingsWithDriverId, { status: 200 });
   } catch (error: any) {
     console.error("Get passenger bookings error:", error);
     return NextResponse.json(
@@ -81,6 +94,7 @@ export async function POST(req: Request) {
         destination: ride.destination,
         departureTime: ride.departureTime,
         driverName: ride.driverName,
+        driverId: ride.driverId,
       },
     });
 
