@@ -7,7 +7,6 @@ export const ROUTES = {
   register: "/register",
   dashboard: "/dashboard",
   dashboardRides: "/dashboard/rides",
-  dashboardBookings: "/dashboard/bookings",
   dashboardMessages: "/dashboard/messages",
   dashboardCommunity: "/dashboard/community",
   dashboardProfile: "/dashboard/profile",
