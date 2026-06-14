@@ -240,6 +240,25 @@ export default function RidesPage() {
     );
   };
 
+  const handleContactPassengerForRequest = (request: RideRequest) => {
+    const autoMsg = "Hi, I have accepted your ride request!";
+    router.push(
+      `/dashboard/messages?userId=${request.passengerId}&name=${encodeURIComponent(
+        request.passengerName
+      )}&role=passenger&autoMessage=${encodeURIComponent(autoMsg)}`
+    );
+  };
+
+  const handleContactDriverForRequest = (request: RideRequest) => {
+    if (!request.driverId) return;
+    const autoMsg = "Hi, I would like to coordinate for our accepted ride request!";
+    router.push(
+      `/dashboard/messages?userId=${request.driverId}&name=${encodeURIComponent(
+        "Driver Partner"
+      )}&role=driver&autoMessage=${encodeURIComponent(autoMsg)}`
+    );
+  };
+
   const formatDateTime = (isoString: string) => {
     const d = new Date(isoString);
     return {
@@ -743,26 +762,50 @@ export default function RidesPage() {
                         {/* Accept or Cancel Action */}
                         <div className="pt-2">
                           {isPassenger ? (
-                            request.status === "pending" && (
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => handleCancelRequest(request.id)}
-                                className="border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 w-full text-xs h-9 cursor-pointer"
-                              >
-                                Cancel Request
-                              </Button>
-                            )
+                            <>
+                              {request.status === "pending" && (
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => handleCancelRequest(request.id)}
+                                  className="border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 w-full text-xs h-9 cursor-pointer"
+                                >
+                                  Cancel Request
+                                </Button>
+                              )}
+                              {request.status === "accepted" && request.driverId && (
+                                <Button
+                                  size="sm"
+                                  onClick={() => handleContactDriverForRequest(request)}
+                                  className="bg-neutral-950 hover:bg-neutral-800 text-white w-full text-xs h-9 cursor-pointer flex gap-2 items-center justify-center"
+                                >
+                                  <MessageSquare className="size-4" />
+                                  Contact Driver
+                                </Button>
+                              )}
+                            </>
                           ) : (
-                            request.status === "pending" && (
-                              <Button
-                                size="sm"
-                                onClick={() => handleAcceptGeneralRequest(request.id)}
-                                className="bg-brand-600 hover:bg-brand-700 text-white w-full text-xs h-9 cursor-pointer"
-                              >
-                                Accept Request
-                              </Button>
-                            )
+                            <>
+                              {request.status === "pending" && (
+                                <Button
+                                  size="sm"
+                                  onClick={() => handleAcceptGeneralRequest(request.id)}
+                                  className="bg-brand-600 hover:bg-brand-700 text-white w-full text-xs h-9 cursor-pointer"
+                                >
+                                  Accept Request
+                                </Button>
+                              )}
+                              {request.status === "accepted" && (
+                                <Button
+                                  size="sm"
+                                  onClick={() => handleContactPassengerForRequest(request)}
+                                  className="bg-neutral-950 hover:bg-neutral-800 text-white w-full text-xs h-9 cursor-pointer flex gap-2 items-center justify-center"
+                                >
+                                  <MessageSquare className="size-4" />
+                                  Contact Passenger
+                                </Button>
+                              )}
+                            </>
                           )}
                         </div>
                       </CardContent>

@@ -1,7 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { MapPin, Calendar, Users, Search, Loader2, Star, Check } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { MapPin, Calendar, Users, Search, Loader2, Star, Check, MessageSquare } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,6 +13,7 @@ import { rideService } from "@/services/ride.service";
 import type { RideRequest } from "@/types";
 
 export default function RequestedRidesPage() {
+  const router = useRouter();
   const { user } = useAuthContext();
   const [requests, setRequests] = useState<RideRequest[]>([]);
   const [filteredRequests, setFilteredRequests] = useState<RideRequest[]>([]);
@@ -110,6 +112,15 @@ export default function RequestedRidesPage() {
     } catch (err: any) {
       alert(err.message || "Failed to accept ride request.");
     }
+  };
+
+  const handleContactPassengerForRequest = (request: RideRequest) => {
+    const autoMsg = "Hi, I have accepted your ride request!";
+    router.push(
+      `/dashboard/messages?userId=${request.passengerId}&name=${encodeURIComponent(
+        request.passengerName
+      )}&role=passenger&autoMessage=${encodeURIComponent(autoMsg)}`
+    );
   };
 
   const formatDateTime = (isoString: string) => {
@@ -286,7 +297,7 @@ export default function RequestedRidesPage() {
 
                   {/* Accept Action */}
                   <div className="pt-2">
-                    {request.status === "pending" && (
+                    {request.status === "pending" ? (
                       <Button
                         size="sm"
                         onClick={() => handleAcceptRequest(request.id)}
@@ -294,6 +305,15 @@ export default function RequestedRidesPage() {
                       >
                         <Check className="size-4" />
                         Accept Request
+                      </Button>
+                    ) : request.status === "accepted" && (
+                      <Button
+                        size="sm"
+                        onClick={() => handleContactPassengerForRequest(request)}
+                        className="bg-neutral-950 hover:bg-neutral-800 text-white w-full text-xs h-9 cursor-pointer flex gap-2 items-center justify-center"
+                      >
+                        <MessageSquare className="size-4" />
+                        Contact Passenger
                       </Button>
                     )}
                   </div>
