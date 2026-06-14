@@ -24,7 +24,6 @@ export function SearchWidget() {
     const query = new URLSearchParams();
     if (params.origin) query.append("originCity", params.origin);
     if (params.destination) query.append("destinationCity", params.destination);
-    if (params.date) query.append("date", params.date);
     if (params.passengers) query.append("seats", String(params.passengers));
 
     if (typeof window !== "undefined") {
@@ -55,7 +54,7 @@ export function SearchWidget() {
         </span>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <div className="space-y-2 sm:col-span-2 lg:col-span-1">
           <Label htmlFor="origin" className="text-neutral-600">
             From
@@ -86,24 +85,6 @@ export function SearchWidget() {
               value={params.destination}
               onChange={(e) =>
                 setParams((p) => ({ ...p, destination: e.target.value }))
-              }
-              className="h-12 border-neutral-200 bg-neutral-50 pl-10 text-neutral-900"
-            />
-          </div>
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="date" className="text-neutral-600">
-            Date
-          </Label>
-          <div className="relative">
-            <Calendar className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-neutral-400" />
-            <Input
-              id="date"
-              type="date"
-              value={params.date}
-              onChange={(e) =>
-                setParams((p) => ({ ...p, date: e.target.value }))
               }
               className="h-12 border-neutral-200 bg-neutral-50 pl-10 text-neutral-900"
             />

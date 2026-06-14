@@ -35,7 +35,6 @@ export function SearchResultsContent() {
   const [inputs, setInputs] = useState({
     originCity: searchParams.get("originCity") || "",
     destinationCity: searchParams.get("destinationCity") || "",
-    date: searchParams.get("date") || "",
     seats: Number(searchParams.get("seats") || 1),
   });
 
@@ -65,7 +64,6 @@ export function SearchResultsContent() {
     setInputs({
       originCity: searchParams.get("originCity") || "",
       destinationCity: searchParams.get("destinationCity") || "",
-      date: searchParams.get("date") || "",
       seats: Number(searchParams.get("seats") || 1),
     });
   }, [searchParams]);
@@ -105,7 +103,6 @@ export function SearchResultsContent() {
       const queryParams = {
         originCity: searchParams.get("originCity") || undefined,
         destinationCity: searchParams.get("destinationCity") || undefined,
-        date: searchParams.get("date") || undefined,
         seats: Number(searchParams.get("seats") || 1),
         sortBy,
         sortOrder,
@@ -135,7 +132,6 @@ export function SearchResultsContent() {
     const query = new URLSearchParams();
     if (inputs.originCity) query.append("originCity", inputs.originCity);
     if (inputs.destinationCity) query.append("destinationCity", inputs.destinationCity);
-    if (inputs.date) query.append("date", inputs.date);
     if (inputs.seats) query.append("seats", String(inputs.seats));
 
     setCurrentPage(1); // Reset to page 1 on new query
@@ -178,7 +174,7 @@ export function SearchResultsContent() {
       {/* Refine Search Widget */}
       <form
         onSubmit={handleSearchSubmit}
-        className="rounded-2xl border border-neutral-200 bg-white p-4 shadow-sm grid gap-4 sm:grid-cols-2 lg:grid-cols-5 items-end"
+        className="rounded-2xl border border-neutral-200 bg-white p-4 shadow-sm grid gap-4 sm:grid-cols-2 lg:grid-cols-4 items-end"
       >
         <div className="space-y-1">
           <Label htmlFor="originCity" className="text-neutral-500">From (City)</Label>
@@ -204,21 +200,6 @@ export function SearchResultsContent() {
               value={inputs.destinationCity}
               onChange={(e) => setInputs((p) => ({ ...p, destinationCity: e.target.value }))}
               className="h-10 pl-9 border-neutral-200 bg-neutral-50"
-            />
-          </div>
-        </div>
-
-
-        <div className="space-y-1">
-          <Label htmlFor="date" className="text-neutral-500">Date</Label>
-          <div className="relative">
-            <Calendar className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-neutral-400" />
-            <Input
-              id="date"
-              type="date"
-              value={inputs.date}
-              onChange={(e) => setInputs((p) => ({ ...p, date: e.target.value }))}
-              className="h-10 pl-9 border-neutral-200 bg-neutral-50 text-neutral-900"
             />
           </div>
         </div>

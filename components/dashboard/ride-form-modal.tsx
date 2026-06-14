@@ -34,12 +34,20 @@ export function RideFormModal({
   const [error, setError] = useState("");
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
 
+  const getTodayStr = () => {
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, "0");
+    const dd = String(today.getDate()).padStart(2, "0");
+    return `${yyyy}-${mm}-${dd}`;
+  };
+
   const [formData, setFormData] = useState({
     originAddress: "",
     originCity: "",
     destinationAddress: "",
     destinationCity: "",
-    date: "",
+    date: getTodayStr(),
     time: "",
     availableSeats: 3,
     pricePerSeat: 15,
@@ -79,7 +87,7 @@ export function RideFormModal({
         originCity: "",
         destinationAddress: "",
         destinationCity: "",
-        date: "",
+        date: getTodayStr(),
         time: "",
         availableSeats: 3,
         pricePerSeat: 15,
@@ -108,7 +116,6 @@ export function RideFormModal({
     if (!formData.originCity.trim()) errs.originCity = "Source city is required";
     if (!formData.destinationAddress.trim()) errs.destinationAddress = "Destination address is required";
     if (!formData.destinationCity.trim()) errs.destinationCity = "Destination city is required";
-    if (!formData.date) errs.date = "Departure date is required";
     if (!formData.time) errs.time = "Departure time is required";
     if (formData.availableSeats <= 0) errs.availableSeats = "Must offer at least 1 seat";
     if (formData.pricePerSeat < 0) errs.pricePerSeat = "Price cannot be negative";
@@ -120,7 +127,7 @@ export function RideFormModal({
     if (formData.date && formData.time) {
       const departure = new Date(`${formData.date}T${formData.time}`);
       if (departure.getTime() <= Date.now()) {
-        errs.date = "Departure must be in the future";
+        errs.time = "Departure time must be in the future";
       }
     }
 
@@ -279,33 +286,18 @@ export function RideFormModal({
               Schedule & Pricing
             </h3>
 
-            <div className="grid gap-3 sm:grid-cols-2">
-              <div className="space-y-1">
-                <Label htmlFor="date">Departure Date</Label>
-                <Input
-                  id="date"
-                  type="date"
-                  value={formData.date}
-                  onChange={(e) => handleChange("date", e.target.value)}
-                  className="h-10 text-neutral-900"
-                />
-                {validationErrors.date && (
-                  <p className="text-xs text-red-600">{validationErrors.date}</p>
-                )}
-              </div>
-              <div className="space-y-1">
-                <Label htmlFor="time">Departure Time</Label>
-                <Input
-                  id="time"
-                  type="time"
-                  value={formData.time}
-                  onChange={(e) => handleChange("time", e.target.value)}
-                  className="h-10 text-neutral-900"
-                />
-                {validationErrors.time && (
-                  <p className="text-xs text-red-600">{validationErrors.time}</p>
-                )}
-              </div>
+            <div className="space-y-1">
+              <Label htmlFor="time">Departure Time</Label>
+              <Input
+                id="time"
+                type="time"
+                value={formData.time}
+                onChange={(e) => handleChange("time", e.target.value)}
+                className="h-10 text-neutral-900"
+              />
+              {validationErrors.time && (
+                <p className="text-xs text-red-600">{validationErrors.time}</p>
+              )}
             </div>
 
             <div className="grid gap-3 sm:grid-cols-2">

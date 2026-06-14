@@ -32,12 +32,20 @@ export function RideRequestModal({
   const [error, setError] = useState("");
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
 
+  const getTodayStr = () => {
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, "0");
+    const dd = String(today.getDate()).padStart(2, "0");
+    return `${yyyy}-${mm}-${dd}`;
+  };
+
   const [formData, setFormData] = useState({
     originAddress: "",
     originCity: "Lahore",
     destinationAddress: "",
     destinationCity: "Lahore",
-    date: "",
+    date: getTodayStr(),
     time: "",
     seatsNeeded: 1,
     proposedPrice: 100,
@@ -69,7 +77,7 @@ export function RideRequestModal({
         originCity: "Lahore",
         destinationAddress: "",
         destinationCity: "Lahore",
-        date: "",
+        date: getTodayStr(),
         time: "",
         seatsNeeded: 1,
         proposedPrice: 100,
@@ -94,7 +102,6 @@ export function RideRequestModal({
     if (!formData.originCity.trim()) errs.originCity = "Source city is required";
     if (!formData.destinationAddress.trim()) errs.destinationAddress = "Destination address is required";
     if (!formData.destinationCity.trim()) errs.destinationCity = "Destination city is required";
-    if (!formData.date) errs.date = "Departure date is required";
     if (!formData.time) errs.time = "Departure time is required";
     if (formData.seatsNeeded <= 0) errs.seatsNeeded = "Must request at least 1 seat";
     if (formData.proposedPrice < 0) errs.proposedPrice = "Proposed fare cannot be negative";
@@ -103,7 +110,7 @@ export function RideRequestModal({
     if (formData.date && formData.time) {
       const departure = new Date(`${formData.date}T${formData.time}`);
       if (departure.getTime() <= Date.now()) {
-        errs.date = "Departure must be in the future";
+        errs.time = "Departure time must be in the future";
       }
     }
 
@@ -248,33 +255,18 @@ export function RideRequestModal({
               Schedule & Proposed Price
             </h3>
 
-            <div className="grid gap-3 sm:grid-cols-2">
-              <div className="space-y-1">
-                <Label htmlFor="date">Departure Date</Label>
-                <Input
-                  id="date"
-                  type="date"
-                  value={formData.date}
-                  onChange={(e) => handleChange("date", e.target.value)}
-                  className="h-10 text-neutral-900"
-                />
-                {validationErrors.date && (
-                  <p className="text-xs text-red-600">{validationErrors.date}</p>
-                )}
-              </div>
-              <div className="space-y-1">
-                <Label htmlFor="time">Departure Time</Label>
-                <Input
-                  id="time"
-                  type="time"
-                  value={formData.time}
-                  onChange={(e) => handleChange("time", e.target.value)}
-                  className="h-10 text-neutral-900"
-                />
-                {validationErrors.time && (
-                  <p className="text-xs text-red-600">{validationErrors.time}</p>
-                )}
-              </div>
+            <div className="space-y-1">
+              <Label htmlFor="time">Departure Time</Label>
+              <Input
+                id="time"
+                type="time"
+                value={formData.time}
+                onChange={(e) => handleChange("time", e.target.value)}
+                className="h-10 text-neutral-900"
+              />
+              {validationErrors.time && (
+                <p className="text-xs text-red-600">{validationErrors.time}</p>
+              )}
             </div>
 
             <div className="grid gap-3 sm:grid-cols-2">
