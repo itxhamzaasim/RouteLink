@@ -91,7 +91,7 @@ const RideSchema = new Schema<IRide>(
     availableSeats: {
       type: Number,
       required: [true, "Available seats count is required"],
-      min: [1, "Seats count must be at least 1"],
+      min: [0, "Seats count cannot be negative"],
     },
     pricePerSeat: {
       type: Number,
