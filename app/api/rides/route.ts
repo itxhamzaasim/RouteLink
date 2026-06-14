@@ -36,12 +36,24 @@ export async function GET(req: Request) {
 
     if (originCity && originCity.trim()) {
       const escaped = escapeRegExp(originCity.trim());
-      query["origin.city"] = { $regex: new RegExp(escaped, "i") };
+      query.$and = query.$and || [];
+      query.$and.push({
+        $or: [
+          { "origin.city": { $regex: new RegExp(escaped, "i") } },
+          { "origin.address": { $regex: new RegExp(escaped, "i") } }
+        ]
+      });
     }
 
     if (destinationCity && destinationCity.trim()) {
       const escaped = escapeRegExp(destinationCity.trim());
-      query["destination.city"] = { $regex: new RegExp(escaped, "i") };
+      query.$and = query.$and || [];
+      query.$and.push({
+        $or: [
+          { "destination.city": { $regex: new RegExp(escaped, "i") } },
+          { "destination.address": { $regex: new RegExp(escaped, "i") } }
+        ]
+      });
     }
 
     if (seats) {
@@ -55,9 +67,6 @@ export async function GET(req: Request) {
       const startOfDay = new Date(`${date}T00:00:00.000Z`);
       const endOfDay = new Date(`${date}T23:59:59.999Z`);
       query.departureTime = { $gte: startOfDay, $lte: endOfDay };
-    } else {
-      // Future rides only if no date is specified
-      query.departureTime = { $gte: new Date() };
     }
 
     // Sorting

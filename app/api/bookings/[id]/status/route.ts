@@ -77,19 +77,24 @@ export async function PATCH(
         return NextResponse.json({ message: "Booking is already accepted." }, { status: 400 });
       }
 
-      // Set available seats to 0 so the ride immediately disappears for others
-      const updatedRide = await Ride.findByIdAndUpdate(
-        booking.rideId,
-        { $set: { availableSeats: 0 } },
-        { new: true }
-      );
-
+      // Decrement the available seats by the number of seats booked
+      const updatedRide = await Ride.findById(booking.rideId);
       if (!updatedRide) {
         return NextResponse.json(
           { message: "Associated ride not found." },
           { status: 400 }
         );
       }
+
+      if (updatedRide.availableSeats < booking.seatsBooked) {
+        return NextResponse.json(
+          { message: `Not enough available seats left. Only ${updatedRide.availableSeats} seat(s) left.` },
+          { status: 400 }
+        );
+      }
+
+      updatedRide.availableSeats -= booking.seatsBooked;
+      await updatedRide.save();
 
       // Notify accepted passenger
       const notification = new Notification({
@@ -99,11 +104,12 @@ export async function PATCH(
       });
       await notification.save();
 
-      // Reject all other pending bookings for this same ride
+      // Reject other pending bookings for this same ride that exceed the remaining available seats
       const otherPendingBookings = await Booking.find({
         rideId: booking.rideId,
         _id: { $ne: booking._id },
         status: "pending",
+        seatsBooked: { $gt: updatedRide.availableSeats },
       });
 
       for (const pendingBk of otherPendingBookings) {
@@ -114,7 +120,7 @@ export async function PATCH(
         const declineNotif = new Notification({
           userId: pendingBk.passengerId,
           title: "Ride Request Declined",
-          message: `Your request for ${pendingBk.seatsBooked} seat(s) on the ride from ${updatedRide.origin.city} to ${updatedRide.destination.city} was declined because another passenger was accepted.`,
+          message: `Your request for ${pendingBk.seatsBooked} seat(s) on the ride from ${updatedRide.origin.city} to ${updatedRide.destination.city} was declined because not enough available seats remain.`,
         });
         await declineNotif.save();
       }
